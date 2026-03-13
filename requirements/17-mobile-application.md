@@ -67,3 +67,18 @@ This document defines the functional requirements for the Insight fitness platfo
 | FR-MA-036 | The system shall support in-app video playback for viewing coach feedback recordings and exercise demonstration videos. |
 | FR-MA-037 | The system shall provide an in-app timer with configurable intervals and audio cues for use during timed workouts and rest periods. |
 | FR-MA-038 | The system shall integrate with the device's music player, allowing users to play, pause, and control music playback during workouts without leaving the app. |
+
+---
+
+## 17.5 Concept2 BLE & Live Workout
+
+| ID | Requirement |
+|----|-------------|
+| FR-MA-039 | The system shall support direct Bluetooth LE connection to Concept2 PM5 monitors from the mobile application, including scanning for nearby PM5 devices, displaying available machines with signal strength, and establishing a connection. (Cross-ref: FR-CE-007) |
+| FR-MA-040 | The system shall auto-detect the Concept2 machine type (RowErg, BikeErg, or SkiErg) from the connected PM5 signal and configure the display accordingly. |
+| FR-MA-041 | The system shall display real-time workout metrics during a BLE-connected Concept2 session: live pace (per 500m or per km), stroke or pedal rate, total distance, elapsed time, remaining time or distance (for targeted workouts), calories (total and per hour), watts (current and average), and heart rate with zone indicator (if wearable connected). |
+| FR-MA-042 | The system shall provide multiple swipeable screen layouts during a live Concept2 workout: Summary view, Pace Graph view, Split Table view, and Heart Rate Zones view. |
+| FR-MA-043 | The system shall support optional voice guidance during a Concept2 workout, providing spoken pace, stroke rate, and split summary information at configurable intervals. |
+| FR-MA-044 | The system shall suppress device screen sleep during an active Concept2 workout session, keeping the display on until the workout is completed or the session is manually ended. |
+| FR-MA-045 | The system shall provide a FitTrack Integration Device setup flow within the mobile app, using Bluetooth LE to provision Wi-Fi credentials to the device, register it with the cloud platform, and link it to the athlete's account. (Cross-ref: FR-CE-052) |
+| FR-MA-046 | The system shall provide a "Start Erg Workout" entry point accessible from the home screen dashboard and quick-action shortcuts, enabling athletes to initiate a Concept2 session directly. |

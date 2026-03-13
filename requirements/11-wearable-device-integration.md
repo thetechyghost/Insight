@@ -103,3 +103,13 @@ This document defines the functional requirements for the Wearable & Device Inte
 | FR-WD-072 | The system shall import calorie and macronutrient data from MyFitnessPal. |
 | FR-WD-073 | The system shall export workout data to TrainingPeaks. |
 | FR-WD-074 | The system shall import training load metrics from TrainingPeaks, including Training Stress Score (TSS), Chronic Training Load (CTL), and Acute Training Load (ATL). |
+
+---
+
+## 11.5 Concept2 Workout Integration
+
+| ID | Requirement |
+|----|-------------|
+| FR-WD-075 | The system shall overlay real-time heart rate data from a connected wearable during a Concept2 workout, regardless of whether the session is captured via direct Bluetooth LE connection or via a FitTrack Integration Device, displaying current BPM and active heart rate zone. |
+| FR-WD-076 | The system shall display a heart rate zone breakdown (time spent in each zone Z1–Z5) as part of the Concept2 post-workout summary screen when wearable heart rate data was available during the workout. (Cross-ref: FR-WD-055, FR-WD-056) |
+| FR-WD-077 | The system shall write completed Concept2 workouts to Apple HealthKit using the appropriate activity type mapping: RowErg sessions as Indoor Rowing, BikeErg sessions as Indoor Cycling, and SkiErg sessions as Other workout type. (Cross-ref: FR-WD-016) |

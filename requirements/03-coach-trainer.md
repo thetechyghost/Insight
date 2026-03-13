@@ -227,3 +227,52 @@ The system shall allow coaches to post in-app announcements visible to all gym m
 
 FR-CT-066
 The system shall provide email and SMS campaign tools that allow coaches to compose and send communications to selected member segments.
+
+---
+
+## 6. Connected Equipment Management
+
+FR-CT-067
+The system shall provide a machine management dashboard displaying the real-time status (Idle, Active, Cooldown, Offline) of all registered FitTrack Integration Devices at the gym, including the currently identified athlete on each active machine. (Cross-ref: FR-CE-048)
+
+FR-CT-068
+The system shall display a live athlete-to-machine assignment view during a class session, showing which athlete is assigned to and identified on each machine as they arrive and check in.
+
+FR-CT-069
+The system shall display live per-machine metrics (current pace, stroke rate, watts, heart rate, distance, and elapsed time) for any active machine during a class session.
+
+FR-CT-070
+The system shall display machine details including human-readable name, physical location label, PM5 firmware version, FitTrack device firmware version, last seen online timestamp, and connection status.
+
+FR-CT-071
+The system shall provide a per-machine maintenance log, allowing coaches and administrators to record and view maintenance events and service history. (Cross-ref: FR-TG-036)
+
+FR-CT-072
+The system shall support class session creation that links a group of athletes, a set of registered machines, and a target workout definition into a single managed event.
+
+FR-CT-073
+The system shall allow a coach to push a target workout to all machines in a class simultaneously via the PUSH_WORKOUT command with a single action. (Cross-ref: FR-CE-051)
+
+FR-CT-074
+The system shall allow a coach to send a synchronized start command (START_CLASS) to all machines in a class, initiating the workout on all machines simultaneously. (Cross-ref: FR-CE-051)
+
+FR-CT-075
+The system shall provide a mid-class individual athlete detail view, accessible by selecting any machine on the dashboard, displaying that athlete's full live metrics and session progress.
+
+FR-CT-076
+The system shall generate a post-class summary displaying all athlete results side by side, with personal bests flagged, average pace per machine, and overall class performance statistics.
+
+FR-CT-077
+The system shall support class results export in CSV format, including all athlete results, splits, and PB indicators.
+
+FR-CT-078
+The system shall support generating a shareable leaderboard image from class results for distribution via messaging or social media.
+
+FR-CT-079
+The system shall support individual machine commands from the coach dashboard: Push Workout (send workout definition to PM5), Reset Machine (return PM5 to idle), Set Athlete (assign athlete to machine session), Start Countdown (push synchronized countdown), Pause (send hold signal), and Request Live Feed (begin streaming real-time data). (Cross-ref: FR-CE-051)
+
+FR-CT-080
+The system shall provide a TV Display mode for live class sessions, accessible via a browser-based URL generated per class session, displaying configurable metrics (athlete name or anonymized label, current pace, cumulative distance, estimated finish position, and a live progress bar) sorted by real-time performance, with new personal bests highlighted mid-workout. (Cross-ref: FR-CT-045, FR-CT-046)
+
+FR-CT-081
+The system shall provide post-class analytics for coaches including attendance and completion rates per class, average pace and wattage trends over time, individual athlete attendance history, at-risk athlete flagging (no attendance in more than 14 days), and machine utilization statistics.

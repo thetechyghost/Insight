@@ -85,3 +85,17 @@ This document defines the functional requirements for the Communication & Messag
 | FR-CM-047 | The system shall send automated post-class follow-up messages to members after they attend a class, at a configurable delay after the class ends. |
 | FR-CM-048 | The system shall send automated milestone celebration messages when members reach significant achievements, including but not limited to their 100th workout and 1-year membership anniversary. |
 | FR-CM-049 | The system shall allow coaches to trigger automated check-in message sequences for their assigned members, initiated manually by the coach with subsequent messages delivered on a predefined schedule. |
+
+---
+
+## 8.6 Concept2 Workout Notifications
+
+| ID | Requirement |
+|----|-------------|
+| FR-CM-050 | The system shall send a training gap push notification when 7 or more days have elapsed since the athlete's last Concept2 workout, encouraging the athlete to return to training. |
+| FR-CM-051 | The system shall send a weekly Concept2 training summary push notification on Sunday evening, summarizing the week's total metres, workout count, personal bests achieved, and machine type distribution. |
+| FR-CM-052 | The system shall send a silent "workout captured" notification when a FitTrack Integration Device records a completed workout, escalating to a prominent push notification with summary details if a personal best is achieved during the workout. (Cross-ref: FR-CM-015) |
+| FR-CM-053 | The system shall send challenge progress push notifications when an athlete reaches 50% of a Concept2 challenge goal and when the challenge is completed. |
+| FR-CM-054 | The system shall send a push notification when an athlete's global or gym Concept2 ranking improves by a significant margin (configurable threshold). |
+| FR-CM-055 | The system shall send a push notification to athletes when a coach assigns a target workout to their upcoming class session via the FitTrack Integration Device. |
+| FR-CM-056 | All Concept2-related notifications (FR-CM-050 through FR-CM-055) shall be individually configurable by the athlete via notification preferences, with default on/off states matching the platform notification defaults. (Cross-ref: FR-CM-020) |

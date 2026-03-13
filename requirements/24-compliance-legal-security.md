@@ -93,7 +93,7 @@ The system shall maintain PCI DSS compliance for all payment processing operatio
 The system shall encrypt all personal and sensitive data at rest using AES-256 or an equivalent encryption standard, with encryption keys managed through a dedicated key management service.
 
 **FR-CS-027**
-The system shall encrypt all data in transit using TLS 1.2 or higher for all communications between clients and servers, between internal services, and between the platform and third-party integrations.
+The system shall encrypt all data in transit using TLS 1.3 for all communications between clients and servers, between internal services, and between the platform and third-party integrations.
 
 **FR-CS-028**
 The system shall support regular security assessments by providing security audit interfaces, vulnerability scanning integration points, and penetration testing coordination capabilities without disrupting production operations.
@@ -112,6 +112,21 @@ The system shall implement secure API authentication using OAuth 2.0 for third-p
 
 **FR-CS-033**
 The system shall enforce rate limiting on all public-facing API endpoints and authentication endpoints, with configurable thresholds per client, and shall automatically block or throttle clients that exceed defined limits to prevent abuse.
+
+**FR-CS-039**
+The system shall authenticate FitTrack Integration Devices using certificate-based mutual TLS (mTLS), ensuring that no shared credentials are used for device-to-cloud communication.
+
+**FR-CS-040**
+The system shall validate over-the-air (OTA) firmware updates using cryptographic signatures before installation on FitTrack Integration Devices, preventing unauthorized or tampered firmware from being deployed. (Cross-ref: FR-CE-054, NFR-025)
+
+**FR-CS-041**
+The system shall default all athlete workout and performance data to private, requiring explicit opt-in before any data is shared with gyms, coaches, or training partners.
+
+**FR-CS-042**
+The system shall provide athletes with a dedicated interface to view all active data-sharing grants (gym affiliations, coach access, training partner visibility) and revoke any grant at any time with immediate effect.
+
+**FR-CS-043**
+The system shall enforce a policy that data sourced from Apple HealthKit is never used for advertising purposes and is never shared with third parties for marketing, in compliance with Apple's HealthKit usage guidelines.
 
 ---
 

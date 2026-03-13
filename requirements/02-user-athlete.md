@@ -352,3 +352,40 @@ The system shall support daily and weekly habit tracking for user-defined habits
 
 FR-UA-105
 The system shall provide goal progress dashboards displaying current progress and projected completion dates for each active goal.
+
+---
+
+## 6. Concept2 Performance Tracking
+
+FR-UA-106
+The system shall display a Concept2-specific post-workout summary screen including a key stats hero card (total distance, total time, average pace, average stroke rate, average watts), personal best comparison with gap indicator, pace graph with stroke rate overlay, split table, heart rate zone breakdown (if wearable data available), global ranking percentile, notes field, and a share button that generates a styled summary card.
+
+FR-UA-107
+The system shall track personal bests for all standard Concept2 distances per machine type: RowErg and SkiErg (100m, 200m, 500m, 1000m, 2000m, 5000m, 6000m, 10000m, Half Marathon, Marathon, 1 min, 4 min, 30 min, 60 min); BikeErg (1000m, 2000m, 4000m, 5000m, 10000m, 20000m, Half Marathon, Marathon, 1 min, 4 min, 30 min, 60 min). (Cross-ref: FR-UA-054)
+
+FR-UA-108
+The system shall display a personal best progression chart per standard Concept2 distance, showing a line graph of historical attempts and PB improvement over time.
+
+FR-UA-109
+The system shall display a "time since last attempt" indicator for each standard Concept2 distance, with visual emphasis when more than 90 days have elapsed since the last attempt.
+
+FR-UA-110
+The system shall provide a "Beat this PB" shortcut from the personal bests board that either pushes a target workout for the selected distance to a connected FitTrack Integration Device or initiates a direct Bluetooth LE session on the mobile app.
+
+FR-UA-111
+The system shall compute an Erg Fitness Score (0–100) derived from recent training volume, pace improvement trends across standard distances, and comparison against global age-and-gender benchmarks, with a trend indicator (improving, stable, or declining over the last 30 days) and a score breakdown showing each component's contribution. (Cross-ref: FR-UA-060)
+
+FR-UA-112
+The system shall classify Concept2 workouts as Verified (captured by a FitTrack Integration Device or validated with a PM5 verification code) or Unverified (manual entry without verification code), and shall exclude Unverified workouts from official rankings and global leaderboards.
+
+FR-UA-113
+The system shall support manual Concept2 workout entry, allowing athletes to enter machine type, workout type, date, total distance, total time, average pace, average stroke rate, average watts, calories, individual split data for interval workouts, freetext notes, and an optional PM5 verification code.
+
+FR-UA-114
+The system shall support workout history filtering by Concept2 machine type (RowErg, BikeErg, SkiErg), workout type (Single Distance, Single Time, Interval, Free), date range, and verified/unverified status.
+
+FR-UA-115
+The system shall track a Concept2-specific training streak measuring consecutive days or weeks with at least one Concept2 workout logged.
+
+FR-UA-116
+The system shall generate a shareable workout summary card (styled image) suitable for posting to social media platforms after a Concept2 workout is completed.

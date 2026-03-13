@@ -119,13 +119,38 @@ A C#-based API layer running on Azure Functions provides access to all performan
   - Device-to-cloud telemetry routing
   - Cloud-to-device commands (e.g., start/stop session, configure display)
   - Device twin for configuration state management
+  - FitTrack Integration Device provisioning (Personal and Gym modes)
+  - Certificate-based mutual TLS (mTLS) device authentication
+  - OTA firmware distribution to FitTrack devices
+  - Bi-directional command channel for gym-tier device control (PUSH_WORKOUT, START_CLASS, RESET, etc.)
 
 ### 4.3 Data Ingestion Flow
 
+**Path A: Generic Equipment (BLE/FTMS)**
 ```
 Equipment (BLE/FTMS)
     → On-Premise Gateway (Azure IoT Edge)
         → Azure IoT Hub
+            → Azure Event Hub
+                → Event Processing (Azure Functions)
+                    → TimescaleDB
+```
+
+**Path B: Concept2 via FitTrack Integration Device**
+```
+Concept2 PM5 (USB)
+    → FitTrack Integration Device (Wi-Fi/Cellular)
+        → Azure IoT Hub
+            → Azure Event Hub
+                → Event Processing (Azure Functions)
+                    → TimescaleDB
+```
+
+**Path C: Concept2 via Personal BLE (no FitTrack device)**
+```
+Concept2 PM5 (BLE)
+    → FitTrack Mobile App
+        → HTTPS
             → Azure Event Hub
                 → Event Processing (Azure Functions)
                     → TimescaleDB
@@ -148,6 +173,27 @@ Equipment (BLE/FTMS)
   - Protocol translation (BLE FTMS → structured telemetry events)
 - **Upstream Communication:** Secure connection to Azure IoT Hub
 - **Offline Resilience:** Continues local operation when cloud connectivity is interrupted
+
+### 5.2 FitTrack Integration Device
+
+- **Type:** Proprietary hardware bridge between Concept2 PM5 and cloud platform
+- **Physical Interface:** USB connection to PM5 Performance Monitor
+- **Connectivity:** Wi-Fi 802.11 b/g/n (primary), optional LTE cellular (gym-tier)
+- **Cloud Communication:** HTTPS and WebSocket to Azure IoT Hub
+- **Local Storage:** Minimum 4GB for 30-day workout data buffering
+- **Identification Hardware:** NFC reader (phone/fob tap), small e-ink/LCD display for PIN entry and status
+- **Modes:**
+  - Personal Mode: single-owner home use, Wi-Fi, auto-attributed sessions
+  - Gym Mode: multi-user, gym-administered, full bi-directional command support
+- **Key Capabilities:**
+  - Real-time workout data relay to cloud
+  - Bi-directional command channel (PUSH_WORKOUT, RESET, START_CLASS, PAUSE_CLASS, SET_ATHLETE, REQUEST_STATUS, REQUEST_LIVE_DATA)
+  - Store-and-forward on connectivity loss (30-day local buffer)
+  - OTA firmware updates from cloud platform
+  - Athlete identification (NFC tap, QR code, PIN entry, coach assignment)
+  - Auto-detection of connected machine type (RowErg, BikeErg, SkiErg)
+- **Power:** Draws from PM5 USB port (personal mode); independent power supply (gym mode)
+- **Operating Temperature:** 0°C to 50°C
 
 ---
 
@@ -204,6 +250,14 @@ Equipment (BLE/FTMS)
 │  │  BLE ←→ Heart Rate Monitors                             │ │
 │  │  WebSocket → In-Gym Displays / Coach Dashboards         │ │
 │  └─────────────────────────────────────────────────────────┘ │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │    FitTrack Integration Device (one per Concept2 PM5)   │ │
+│  │                                                         │ │
+│  │  USB ←→ Concept2 PM5 (RowErg / BikeErg / SkiErg)       │ │
+│  │  NFC/QR/PIN ←→ Athlete Identification                   │ │
+│  │  Wi-Fi/LTE → Azure IoT Hub (HTTPS/WebSocket)            │ │
+│  │  Local Buffer: 30-day store-and-forward                  │ │
+│  └─────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -220,3 +274,4 @@ Equipment (BLE/FTMS)
 | **Azure Event Hub for ingestion** | Handles high-throughput telemetry from many concurrent gym sessions; partitioning enables parallel processing; native integration with Azure Functions for stream processing |
 | **React 19+ with shadcn/ui for web** | Server components and concurrent features in React 19; shadcn/ui provides accessible, customizable components without vendor lock-in; Tailwind CSS for consistent styling |
 | **React Native for mobile** | Code sharing between iOS and Android; shared mental model with React web team; strong ecosystem for fitness app features (camera, BLE, HealthKit bridges) |
+| **FitTrack Integration Device for Concept2** | Proprietary hardware bridge removes dependency on athlete's phone; enables always-on capture, bi-directional machine control, and gym-tier features (class sync, live leaderboards, TV display) impossible via BLE-to-phone alone; local buffering ensures zero workout data loss |

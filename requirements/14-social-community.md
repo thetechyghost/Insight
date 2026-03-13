@@ -76,3 +76,25 @@ This document defines the functional requirements for the Social & Community dom
 | FR-SC-038 | The system shall detect personal record achievements and provide members with the option to automatically share the PR to their activity feed. |
 | FR-SC-039 | The system shall detect and celebrate streak achievements when a member trains for a defined number of consecutive days or consecutive weeks. |
 | FR-SC-040 | The system shall support a badge and achievement system, awarding unlockable badges to members when they meet defined criteria for accomplishments and milestones. |
+
+---
+
+## 14.6 Concept2 Rankings & Leaderboards
+
+| ID | Requirement |
+|----|-------------|
+| FR-SC-041 | The system shall provide global rankings for each standard Concept2 distance per machine type (RowErg, BikeErg, SkiErg), displaying each athlete's ranking position relative to the platform community. (Cross-ref: FR-SC-022) |
+| FR-SC-042 | The system shall support Concept2 ranking filtering by age group, gender category, and weight class (heavyweight/lightweight for RowErg), matching Concept2's official ranking categories. (Cross-ref: FR-SC-019, FR-SC-020) |
+| FR-SC-043 | The system shall display a percentile indicator for each athlete's Concept2 ranking (e.g., "You are in the top X% globally for [distance] on the [machine type]"). |
+| FR-SC-044 | The system shall provide gym-internal leaderboards for each standard Concept2 distance, filterable by machine type and time period (all time, this season, this month), displaying the athlete's position, gap to the next position, and gap to the gym leader. |
+| FR-SC-045 | The system shall support training partner private leaderboards, allowing athletes to create invite-only leaderboards by FitTrack username or email for any Concept2 distance and machine type. |
+
+---
+
+## 14.7 Concept2 Challenges
+
+| ID | Requirement |
+|----|-------------|
+| FR-SC-046 | The system shall support platform-curated Concept2 challenges including monthly distance challenges, combo challenges (log at least one session on each machine type), and milestone clubs awarding digital badges at 100k, 500k, 1M, 5M, and 10M lifetime metres. |
+| FR-SC-047 | The system shall support a Concept2 season challenge running from May 1 to April 30, mirroring the official Concept2 season calendar and tracking total metres per machine type. |
+| FR-SC-048 | The system shall support gym-created custom Concept2 challenges with configurable parameters: total distance over a period, workout count, specific machine focus, and fastest time on a benchmark distance, with a progress leaderboard visible to all enrolled gym members. (Cross-ref: FR-SC-027) |

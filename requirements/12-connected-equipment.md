@@ -29,7 +29,7 @@ The system shall support equipment pairing, allowing a user's device to be assoc
 ## 12.2 Concept2 Equipment (Rower, SkiErg, BikeErg)
 
 **FR-CE-007**
-The system shall connect to Concept2 equipment via Bluetooth FTMS and the proprietary Concept2 protocol through the PM5 monitor.
+The system shall connect to Concept2 equipment via the FitTrack Integration Device (physical PM5 connection) as the primary method, and via direct Bluetooth FTMS from the mobile application as a secondary method for personal users without a FitTrack device.
 
 **FR-CE-008**
 The system shall capture and display the following real-time data from Concept2 equipment: pace (per 500m and per km), stroke rate or cadence, power in watts, distance, calories, heart rate, elapsed time, split times, drag factor, drive length, drive time, and stroke count.
@@ -145,3 +145,52 @@ The system shall provide a manual override capability for session start and sess
 
 **FR-CE-040**
 The system shall detect and resolve equipment pairing conflicts when multiple users attempt to pair with the same equipment unit, preventing duplicate assignments.
+
+---
+
+## 12.7 FitTrack Integration Device
+
+**FR-CE-041**
+The system shall support a proprietary FitTrack Integration Device that connects physically to the Concept2 PM5 Performance Monitor and relays workout data to the cloud platform in real time via Wi-Fi (primary) or cellular (optional, gym-tier).
+
+**FR-CE-042**
+The FitTrack Integration Device shall operate in two modes: Personal Mode (single-owner, home use, Wi-Fi only, limited command set) and Gym Mode (multi-user, gym-administered, Wi-Fi with optional cellular fallback, full command set).
+
+**FR-CE-043**
+In Personal Mode, the FitTrack Integration Device shall automatically associate all captured workout sessions with the device owner's athlete profile without requiring identification at the machine.
+
+**FR-CE-044**
+In Gym Mode, the FitTrack Integration Device shall support athlete identification via NFC tap (phone or key fob), QR code scan (via FitTrack mobile app), PIN entry (on the device display), or coach assignment from the gym dashboard.
+
+**FR-CE-045**
+In Gym Mode, when no athlete identification is provided, the FitTrack Integration Device shall capture the workout session as an anonymous session linked to the machine and timestamp.
+
+**FR-CE-046**
+The system shall support retroactive workout claiming, allowing an athlete to claim an anonymous session captured on a gym machine within a configurable time window (default 24 hours) by matching machine, time, and optional PM5 confirmation code.
+
+**FR-CE-047**
+The system shall support machine registration by gym administrators, including assigning a human-readable label (e.g., "Rower 3 — Bay A"), physical location, and machine type to each FitTrack device.
+
+**FR-CE-048**
+The system shall track and display the real-time status of each registered FitTrack device with states: Idle, Active (with current athlete if identified), Cooldown, and Offline.
+
+**FR-CE-049**
+The FitTrack Integration Device shall buffer workout data locally for a minimum of 30 days when internet connectivity is unavailable. (Cross-ref: NFR-007)
+
+**FR-CE-050**
+The FitTrack Integration Device shall implement store-and-forward behavior, automatically uploading all locally buffered workout data when internet connectivity is restored, preserving the original timestamps and session integrity.
+
+**FR-CE-051**
+The system shall support the following bi-directional commands between the cloud platform and the FitTrack Integration Device in Gym Mode: PUSH_WORKOUT (send a pre-configured workout to the PM5), RESET (return PM5 to ready state), SET_ATHLETE (associate a session with an athlete profile), START_CLASS (synchronize start across all machines in a class), PAUSE_CLASS (send hold signal to all class machines), REQUEST_STATUS (poll current machine state), and REQUEST_LIVE_DATA (initiate real-time data stream for dashboard display).
+
+**FR-CE-052**
+The system shall support FitTrack device provisioning for Personal Mode via the mobile application, using Bluetooth LE to transfer Wi-Fi credentials, register the device with the cloud platform, and link it to the athlete's account.
+
+**FR-CE-053**
+The system shall support FitTrack device provisioning for Gym Mode via the web-based gym administration dashboard, including Wi-Fi configuration, gym association, machine labeling, and location assignment.
+
+**FR-CE-054**
+The system shall support over-the-air (OTA) firmware updates for the FitTrack Integration Device, initiated and managed from the cloud platform. (Cross-ref: FR-CS-040, NFR-025)
+
+**FR-CE-055**
+The FitTrack Integration Device shall auto-detect the connected Concept2 machine type (RowErg, BikeErg, or SkiErg) from the PM5 data stream and report it to the platform during device registration and at each session start.

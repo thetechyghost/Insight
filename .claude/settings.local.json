@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:www.wodify.com)",
+      "Bash(grep -c \"^FR-\\\\|^\\\\*\\\\*FR-\" /Users/casper/Projects/Insight/requirements/*.md)",
+      "Bash(grep -c \"The system shall\\\\|The system must\" /Users/casper/Projects/Insight/requirements/*.md)",
+      "Bash(wc -l /Users/casper/Projects/Insight/requirements/*.md)",
+      "Bash(sort -t/ -k6)"
+    ]
+  }
+}

@@ -6,7 +6,10 @@
       "Bash(grep -c \"^FR-\\\\|^\\\\*\\\\*FR-\" /Users/casper/Projects/Insight/requirements/*.md)",
       "Bash(grep -c \"The system shall\\\\|The system must\" /Users/casper/Projects/Insight/requirements/*.md)",
       "Bash(wc -l /Users/casper/Projects/Insight/requirements/*.md)",
-      "Bash(sort -t/ -k6)"
+      "Bash(sort -t/ -k6)",
+      "Bash(find /Users/casper/Projects/Insight -type f \\\\\\( -name \"*.js\" -o -name \"*.ts\" -o -name \"*.tsx\" -o -name \"*.py\" -o -name \"*.go\" -o -name \"*.java\" -o -name \"CLAUDE.md\" -o -name \".claude*\" \\\\\\) 2>/dev/null | grep -v node_modules | grep -v \".git\")",
+      "Bash(find /Users/casper/Projects/Insight -type f \\\\\\( -name \"*.ts\" -o -name \"*.tsx\" -o -name \"*.js\" -o -name \"*.jsx\" -o -name \"*.py\" -o -name \"*.go\" -o -name \"package.json\" -o -name \"*.json\" \\\\\\) ! -path \"*/.git/*\" ! -path \"*/.claude/*\" ! -path \"*/node_modules/*\" 2>/dev/null | head -20)",
+      "Bash(grep -h \"^FR-\\\\|^\\\\*\\\\*FR-\" /Users/casper/Projects/Insight/requirements/*.md | wc -l)"
     ]
   }
 }

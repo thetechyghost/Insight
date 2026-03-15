@@ -1,0 +1,31 @@
+{
+  "name": "insight",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thetechyghost/Insight.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/thetechyghost/Insight/issues"
+  },
+  "homepage": "https://github.com/thetechyghost/Insight#readme",
+  "dependencies": {
+    "convex": "^1.33.1",
+    "convex-helpers": "^0.1.114"
+  },
+  "devDependencies": {
+    "@edge-runtime/vm": "^5.0.0",
+    "convex-test": "^0.0.41",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
+  }
+}

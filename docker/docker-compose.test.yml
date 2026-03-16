@@ -1,0 +1,27 @@
+# docker/docker-compose.test.yml
+# Ephemeral self-hosted Convex backend for local integration tests.
+# Started and torn down by scripts/test-local.ts.
+# Uses SQLite (no DATABASE_URL) — data lives in the named volume below.
+
+services:
+  convex-backend:
+    image: ghcr.io/get-convex/convex-backend:latest
+    container_name: convex-test
+    ports:
+      - "3210:3210"
+      - "3211:3211"
+    environment:
+      CONVEX_CLOUD_ORIGIN: "http://localhost:3210"
+      CONVEX_SITE_ORIGIN: "http://localhost:3211"
+      ENABLE_TEST_ENDPOINTS: "test-local-key"
+    volumes:
+      - convex-test-data:/convex/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3210/version"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+
+volumes:
+  convex-test-data:

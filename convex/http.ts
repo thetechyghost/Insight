@@ -1,8 +1,32 @@
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 
 const http = httpRouter();
+
+// ============================================================================
+// Test helpers
+// ============================================================================
+
+/**
+ * Guard: verify the request carries a valid test API key.
+ * Returns null if valid, or an error Response if not.
+ */
+function verifyTestApiKey(request: Request): Response | null {
+  const testApiKey = process.env.ENABLE_TEST_ENDPOINTS;
+  if (!testApiKey) {
+    return new Response("Test endpoints are disabled", { status: 403 });
+  }
+
+  const providedKey = request.headers.get("X-Test-Api-Key");
+  if (providedKey !== testApiKey) {
+    return new Response("Invalid test API key", { status: 401 });
+  }
+
+  return null;
+}
+
+const jsonHeaders = { "Content-Type": "application/json" };
 
 // Auth provider webhook — called when a new user signs up
 http.route({
@@ -58,6 +82,109 @@ http.route({
     return new Response(JSON.stringify({ received: true }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
+    });
+  }),
+});
+
+// ============================================================================
+// Integration Test Endpoints
+// Gated by ENABLE_TEST_ENDPOINTS environment variable on the Convex deployment.
+// ============================================================================
+
+// POST /test/seed — Seed foundation data (users, tenants, memberships, roles)
+http.route({
+  path: "/test/seed",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const authError = verifyTestApiKey(request);
+    if (authError) return authError;
+
+    const body = await request.json();
+    const { users, tenants, memberships } = body;
+
+    const result: Record<string, unknown> = {};
+
+    // Seed tenants
+    if (Array.isArray(tenants)) {
+      result.tenants = {};
+      for (const tenant of tenants) {
+        const tenantId = await ctx.runMutation(internal.testing.seedTenant, {
+          name: tenant.name,
+          slug: tenant.slug,
+        });
+        (result.tenants as Record<string, string>)[tenant.slug] = tenantId;
+      }
+    }
+
+    // Seed users
+    if (Array.isArray(users)) {
+      result.users = {};
+      for (const user of users) {
+        const userId = await ctx.runMutation(internal.testing.seedUser, {
+          name: user.name,
+          email: user.email,
+        });
+        (result.users as Record<string, string>)[user.email] = userId;
+      }
+    }
+
+    // Seed memberships (requires userId + tenantId from above)
+    if (Array.isArray(memberships)) {
+      result.memberships = [];
+      for (const m of memberships) {
+        const membershipId = await ctx.runMutation(
+          internal.testing.seedMembership,
+          {
+            userId: m.userId,
+            tenantId: m.tenantId,
+            role: m.role,
+            isPrimaryGym: m.isPrimaryGym ?? false,
+          }
+        );
+        (result.memberships as string[]).push(membershipId);
+      }
+    }
+
+    // Seed role permissions for each tenant
+    if (result.tenants) {
+      for (const tenantId of Object.values(
+        result.tenants as Record<string, string>
+      )) {
+        await ctx.runMutation(internal.testing.seedRolesPermissions, {
+          tenantId: tenantId as any,
+        });
+      }
+    }
+
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: jsonHeaders,
+    });
+  }),
+});
+
+// POST /test/cleanup — Clean up test data by prefix
+http.route({
+  path: "/test/cleanup",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const authError = verifyTestApiKey(request);
+    if (authError) return authError;
+
+    const body = await request.json();
+    const { prefix } = body;
+
+    if (!prefix || typeof prefix !== "string") {
+      return new Response("Missing or invalid prefix", { status: 400 });
+    }
+
+    const result = await ctx.runMutation(internal.testing.cleanupByPrefix, {
+      prefix,
+    });
+
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: jsonHeaders,
     });
   }),
 });

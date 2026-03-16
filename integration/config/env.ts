@@ -5,6 +5,7 @@ export type TestTarget = "dev" | "preprod";
 export interface TestConfig {
   target: TestTarget;
   convexUrl: string;
+  convexSiteUrl: string;
   testApiKey: string;
 }
 
@@ -30,7 +31,11 @@ export function getTestConfig(): TestConfig {
     );
   }
 
+  const convexSiteUrl =
+    process.env.CONVEX_SITE_URL ??
+    convexUrl.replace(".convex.cloud", ".convex.site");
+
   const testApiKey = process.env.TEST_API_KEY ?? "";
 
-  return { target, convexUrl, testApiKey };
+  return { target, convexUrl, convexSiteUrl, testApiKey };
 }

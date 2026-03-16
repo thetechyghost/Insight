@@ -9,8 +9,9 @@
     "test:integration": "vitest run -c vitest.integration.config.ts",
     "test:integration:preprod": "TEST_TARGET=preprod vitest run -c vitest.integration.config.ts",
     "test:all": "vitest run && vitest run -c vitest.integration.config.ts",
-    "seed:dev": "npx tsx integration/seed/seed-runner.ts",
-    "seed:cleanup": "npx tsx integration/seed/cleanup.ts"
+    "test:local": "npx tsx scripts/test-local.ts",
+    "seed:dev": "npx tsx scripts/seed.ts",
+    "seed:cleanup": "npx tsx scripts/cleanup.ts"
   },
   "repository": {
     "type": "git",

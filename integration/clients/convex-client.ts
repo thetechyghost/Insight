@@ -41,13 +41,9 @@ export async function callTestEndpoint(
   path: string,
   body: Record<string, unknown>
 ): Promise<unknown> {
-  const { convexUrl, testApiKey } = config();
+  const { convexSiteUrl, testApiKey } = config();
 
-  // Convex HTTP actions are at the deployment URL's httpAction path
-  // The site URL is derived from the Convex URL
-  const siteUrl = convexUrl.replace(".convex.cloud", ".convex.site");
-
-  const response = await fetch(`${siteUrl}${path}`, {
+  const response = await fetch(`${convexSiteUrl}${path}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

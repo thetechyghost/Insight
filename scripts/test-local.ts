@@ -74,7 +74,7 @@ function runVitest(env: NodeJS.ProcessEnv): Promise<number> {
       ["vitest", "run", "-c", "vitest.integration.config.ts"],
       { stdio: "inherit", env: { ...process.env, ...env } }
     );
-    child.on("close", resolve);
+    child.on("close", (code, signal) => resolve(code ?? (signal ? 1 : 0)));
     child.on("error", reject);
   });
 }

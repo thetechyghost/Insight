@@ -31,7 +31,12 @@
       "Bash(find /Users/casper/Projects -path \"*/convex/_generated/api.*\" -not -path \"*/node_modules/*\" 2>/dev/null | head -5)",
       "Bash(find /Users/casper -path \"*convex/_generated/api*\" -not -path \"*/node_modules/*\" 2>/dev/null | head -5)",
       "Bash(grep -r \"test\\(\" /Users/casper/Projects/Insight/convex/*.test.ts | wc -l)",
-      "Bash(wc -l /Users/casper/Projects/Insight/convex/*.ts /Users/casper/Projects/Insight/convex/lib/*.ts /Users/casper/Projects/Insight/convex/test/*.ts 2>/dev/null | tail -1)"
+      "Bash(wc -l /Users/casper/Projects/Insight/convex/*.ts /Users/casper/Projects/Insight/convex/lib/*.ts /Users/casper/Projects/Insight/convex/test/*.ts 2>/dev/null | tail -1)",
+      "Bash(ls:*)",
+      "Bash(git:*)",
+      "Bash(grep:*)",
+      "Bash(node:*)",
+      "Bash(npm run:*)"
     ]
   }
 }

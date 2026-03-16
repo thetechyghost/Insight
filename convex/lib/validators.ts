@@ -16,6 +16,17 @@ export const roleValidator = v.union(
   v.literal("admin")
 );
 
+export const platformRoleValidator = v.union(
+  v.literal("super_admin"),
+  v.literal("platform_support"),
+  v.literal("platform_ops")
+);
+
+export const platformAdminStatusValidator = v.union(
+  v.literal("active"),
+  v.literal("suspended")
+);
+
 export const membershipStatusValidator = v.union(
   v.literal("active"),
   v.literal("frozen"),

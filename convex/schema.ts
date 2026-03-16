@@ -1496,7 +1496,8 @@ export default defineSchema({
     checklistState: v.optional(v.any()),
     stripeConnectOnboardingStatus: v.optional(v.string()),
   })
-    .index("by_status", ["status"]),
+    .index("by_status", ["status"])
+    .index("by_tenantId", ["tenantId"]),
 
   platform_audit_log: defineTable({
     actorId: v.id("users"),
@@ -1607,6 +1608,26 @@ export default defineSchema({
     verificationMethod: v.optional(v.string()),
   })
     .index("by_userId", ["userId"]),
+
+  platform_admins: defineTable({
+    userId: v.id("users"),
+    platformRole: v.union(
+      v.literal("super_admin"),
+      v.literal("platform_support"),
+      v.literal("platform_ops")
+    ),
+    status: v.union(v.literal("active"), v.literal("suspended")),
+    lastLoginAt: v.optional(v.number()),
+  })
+    .index("by_userId", ["userId"]),
+
+  platform_tenant_notes: defineTable({
+    tenantId: v.id("tenants"),
+    authorId: v.id("users"),
+    content: v.string(),
+    updatedAt: v.optional(v.number()),
+  })
+    .index("by_tenantId", ["tenantId"]),
 
   check_in_systems: defineTable({
     tenantId: v.id("tenants"),

@@ -81,54 +81,70 @@ function runVitest(env: NodeJS.ProcessEnv): Promise<number> {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
-let exitCode = 0;
+async function main(): Promise<number> {
+  let exitCode = 0;
 
-try {
-  // Step 1: Start container
-  console.log("[test-local] Starting container...");
-  run("docker", ["compose", "-f", COMPOSE_FILE, "up", "-d", "--pull", "always"]);
-
-  // Step 2: Wait for backend health (host-side poll of mapped port 3210)
-  await waitForBackend();
-
-  // Step 3: Generate admin key
-  // Uses service name "convex-backend" (not container_name "convex-test")
-  // -T disables TTY to avoid terminal control characters in captured output
-  console.log("[test-local] Generating admin key...");
-  const adminKey = capture("docker", [
-    "compose", "-f", COMPOSE_FILE,
-    "exec", "-T", "convex-backend",
-    "./generate_admin_key.sh",
-  ]);
-  if (!adminKey) throw new Error("generate_admin_key.sh returned empty output");
-  console.log("[test-local] Admin key obtained");
-
-  // Step 4: Deploy Convex functions to the local instance
-  console.log("[test-local] Deploying Convex functions...");
-  run("npx", ["convex", "deploy", "--yes"], {
-    CONVEX_SELF_HOSTED_URL: BACKEND_URL,
-    CONVEX_SELF_HOSTED_ADMIN_KEY: adminKey,
-  });
-
-  // Step 5: Run integration tests
-  // TEST_TARGET=dev forces getTestConfig() to read CONVEX_URL (not CONVEX_PREPROD_URL),
-  // making the run hermetic regardless of shell environment.
-  console.log("[test-local] Running integration tests...");
-  exitCode = await runVitest({
-    TEST_TARGET: "dev",
-    CONVEX_URL: BACKEND_URL,
-    CONVEX_SITE_URL: SITE_URL,
-    TEST_API_KEY,
-  });
-} finally {
-  // Step 6: Always tear down — prevents orphaned containers on failure
-  console.log("\n[test-local] Tearing down container...");
   try {
-    run("docker", ["compose", "-f", COMPOSE_FILE, "down", "-v"]);
-    console.log("[test-local] Container removed");
-  } catch (err) {
-    console.error("[test-local] Teardown failed:", err);
+    // Step 1: Start container
+    console.log("[test-local] Starting container...");
+    run("docker", ["compose", "-f", COMPOSE_FILE, "up", "-d", "--pull", "always"]);
+
+    // Step 2: Wait for backend health (host-side poll of mapped port 3210)
+    await waitForBackend();
+
+    // Step 3: Generate admin key
+    // Uses service name "convex-backend" (not container_name "convex-test")
+    // -T disables TTY to avoid terminal control characters in captured output
+    console.log("[test-local] Generating admin key...");
+    const adminKey = capture("docker", [
+      "compose", "-f", COMPOSE_FILE,
+      "exec", "-T", "convex-backend",
+      "./generate_admin_key.sh",
+    ]);
+    if (!adminKey) throw new Error("generate_admin_key.sh returned empty output");
+    console.log("[test-local] Admin key obtained");
+
+    // Step 4: Deploy Convex functions to the local instance
+    console.log("[test-local] Deploying Convex functions...");
+    run("npx", ["convex", "deploy", "--yes", "--typecheck=disable"], {
+      CONVEX_SELF_HOSTED_URL: BACKEND_URL,
+      CONVEX_SELF_HOSTED_ADMIN_KEY: adminKey,
+    });
+
+    // Step 4b: Set ENABLE_TEST_ENDPOINTS in the Convex deployment env store
+    // (Container-level env vars are NOT exposed to Convex function process.env —
+    // Convex functions read from the deployment's own env store, set via convex env.)
+    console.log("[test-local] Enabling test endpoints...");
+    run("npx", ["convex", "env", "set", "ENABLE_TEST_ENDPOINTS", TEST_API_KEY], {
+      CONVEX_SELF_HOSTED_URL: BACKEND_URL,
+      CONVEX_SELF_HOSTED_ADMIN_KEY: adminKey,
+    });
+
+    // Step 5: Run integration tests
+    // TEST_TARGET=dev forces getTestConfig() to read CONVEX_URL (not CONVEX_PREPROD_URL),
+    // making the run hermetic regardless of shell environment.
+    console.log("[test-local] Running integration tests...");
+    exitCode = await runVitest({
+      TEST_TARGET: "dev",
+      CONVEX_URL: BACKEND_URL,
+      CONVEX_SITE_URL: SITE_URL,
+      TEST_API_KEY,
+    });
+  } finally {
+    // Step 6: Always tear down — prevents orphaned containers on failure
+    console.log("\n[test-local] Tearing down container...");
+    try {
+      run("docker", ["compose", "-f", COMPOSE_FILE, "down", "-v"]);
+      console.log("[test-local] Container removed");
+    } catch (err) {
+      console.error("[test-local] Teardown failed:", err);
+    }
   }
+
+  return exitCode;
 }
 
-process.exit(exitCode);
+main().then(process.exit).catch((err) => {
+  console.error("[test-local] Fatal error:", err);
+  process.exit(1);
+});

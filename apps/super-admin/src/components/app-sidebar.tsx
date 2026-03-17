@@ -8,6 +8,13 @@ import {
   Dumbbell,
   Trophy,
   Megaphone,
+  Shield,
+  Key,
+  Plug,
+  Scale,
+  FileText,
+  UserCheck,
+  ShieldAlert,
 } from "lucide-react";
 import {
   Sidebar,
@@ -40,6 +47,28 @@ const navGroups: NavGroup[] = [
       { title: "Exercises", url: "/exercises", icon: Dumbbell },
       { title: "Benchmarks", url: "/benchmarks", icon: Trophy },
       { title: "Announcements", url: "/announcements", icon: Megaphone },
+      { title: "Moderation", url: "/moderation", icon: ShieldAlert },
+    ],
+  },
+  {
+    label: "Compliance",
+    items: [
+      { title: "Data Requests", url: "/compliance", icon: Scale },
+      { title: "Legal Documents", url: "/compliance/legal-documents", icon: FileText },
+      { title: "Age Verification", url: "/compliance/age-verification", icon: UserCheck },
+    ],
+  },
+  {
+    label: "Security",
+    items: [
+      { title: "Events", url: "/security", icon: Shield },
+      { title: "API Keys", url: "/security/api-keys", icon: Key },
+    ],
+  },
+  {
+    label: "Integrations",
+    items: [
+      { title: "Connections", url: "/integrations", icon: Plug },
     ],
   },
   {

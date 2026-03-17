@@ -52,7 +52,10 @@
       "mcp__plugin_playwright_playwright__browser_evaluate",
       "mcp__plugin_playwright_playwright__browser_take_screenshot",
       "Bash(npx tsr:*)",
-      "Bash(npx vite:*)"
+      "Bash(npx vite:*)",
+      "Bash(done)",
+      "Bash(sort -t: -k2 -rn)",
+      "Bash(ADMIN_EMAIL=\"alice+t-mmuw85g6-4t79@test.insight.app\")"
     ]
   }
 }

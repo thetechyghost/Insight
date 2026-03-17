@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
 import { useState, useCallback } from "react";
@@ -56,10 +56,15 @@ function TenantsPage() {
             Manage all gym tenants on the platform
           </p>
         </div>
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Tenant
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setCreateOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Quick Create
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/tenants/provision">Provision Wizard</Link>
+          </Button>
+        </div>
       </div>
 
       <div className="flex gap-2">

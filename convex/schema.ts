@@ -1732,4 +1732,21 @@ export default defineSchema({
   })
     .index("by_status", ["status"])
     .index("by_publishedAt", ["publishedAt"]),
+
+  moderation_queue: defineTable({
+    contentType: v.union(
+      v.literal("post"), v.literal("comment"), v.literal("media"),
+    ),
+    contentId: v.string(),
+    tenantId: v.id("tenants"),
+    reportedBy: v.optional(v.id("users")),
+    reason: v.string(),
+    status: v.union(
+      v.literal("pending"), v.literal("approved"), v.literal("removed"),
+    ),
+    reviewedBy: v.optional(v.id("users")),
+    reviewedAt: v.optional(v.number()),
+  })
+    .index("by_status", ["status"])
+    .index("by_tenantId", ["tenantId"]),
 });

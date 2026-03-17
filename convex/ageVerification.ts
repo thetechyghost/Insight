@@ -23,6 +23,18 @@ const verificationDoc = v.object({
 });
 
 // ============================================================================
+// listAll — list all age verification records (platform admin)
+// ============================================================================
+
+export const listAll = authedQuery({
+  args: {},
+  returns: v.array(verificationDoc),
+  handler: async (ctx) => {
+    return await ctx.db.query("age_verification").collect();
+  },
+});
+
+// ============================================================================
 // getByUser — get age verification record for a user
 // ============================================================================
 

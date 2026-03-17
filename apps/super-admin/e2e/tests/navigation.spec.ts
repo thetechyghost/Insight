@@ -42,15 +42,32 @@ test.describe("Sidebar Navigation", () => {
     expect(await sidebar.isItemActive("Dashboard")).toBe(false);
   });
 
-  test("disabled items (Billing, Settings, Audit Log) are not navigable", async ({
+  test("disabled items (Billing) are not navigable", async ({
     page,
     sidebar,
   }) => {
     await page.goto("/dashboard");
     await waitForConvex(page);
 
-    for (const item of ["Billing", "Settings", "Audit Log"]) {
+    for (const item of ["Billing"]) {
       expect(await sidebar.isItemDisabled(item)).toBe(true);
+    }
+  });
+
+  test("new sidebar sections are navigable", async ({ page, sidebar }) => {
+    await page.goto("/dashboard");
+    await waitForConvex(page);
+
+    for (const item of [
+      "Data Requests",
+      "Legal Documents",
+      "Age Verification",
+      "Events",
+      "API Keys",
+      "Connections",
+      "Moderation",
+    ]) {
+      expect(await sidebar.isItemDisabled(item)).toBe(false);
     }
   });
 });

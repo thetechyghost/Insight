@@ -20,6 +20,18 @@ const consentDoc = v.object({
 });
 
 // ============================================================================
+// listAll — list all consent records (platform admin)
+// ============================================================================
+
+export const listAll = authedQuery({
+  args: {},
+  returns: v.array(consentDoc),
+  handler: async (ctx) => {
+    return await ctx.db.query("consent_records").collect();
+  },
+});
+
+// ============================================================================
 // listMine — list the current user's consent records
 // ============================================================================
 

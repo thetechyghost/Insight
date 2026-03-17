@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import {
   AreaChart,
   Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -124,43 +126,62 @@ function DashboardPage() {
 
       {/* Comparative Metrics */}
       {comparativeMetrics && comparativeMetrics.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">Tenant Comparison</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-md border">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left px-4 py-2 font-medium">Tenant</th>
-                    <th className="text-left px-4 py-2 font-medium">Members</th>
-                    <th className="text-left px-4 py-2 font-medium">Active Rate (30d)</th>
-                    <th className="text-left px-4 py-2 font-medium">Workouts/Member (30d)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {comparativeMetrics.map((m) => (
-                    <tr key={m.tenantId} className="border-b last:border-0">
-                      <td className="px-4 py-2">
-                        <Link
-                          to="/tenants/$tenantId"
-                          params={{ tenantId: m.tenantId }}
-                          className="text-primary hover:underline"
-                        >
-                          {m.tenantName}
-                        </Link>
-                      </td>
-                      <td className="px-4 py-2">{m.memberCount}</td>
-                      <td className="px-4 py-2">{m.activeRate30d}%</td>
-                      <td className="px-4 py-2">{m.workoutsPerMember30d}</td>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm font-medium">Tenant Engagement</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart data={comparativeMetrics}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis dataKey="tenantName" className="text-xs" />
+                  <YAxis className="text-xs" />
+                  <Tooltip />
+                  <Bar dataKey="activeRate30d" name="Active Rate %" className="fill-primary" />
+                  <Bar dataKey="workoutsPerMember30d" name="Workouts/Member" className="fill-secondary" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm font-medium">Tenant Comparison</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left px-4 py-2 font-medium">Tenant</th>
+                      <th className="text-left px-4 py-2 font-medium">Members</th>
+                      <th className="text-left px-4 py-2 font-medium">Active Rate</th>
+                      <th className="text-left px-4 py-2 font-medium">Workouts/M</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+                  </thead>
+                  <tbody>
+                    {comparativeMetrics.map((m) => (
+                      <tr key={m.tenantId} className="border-b last:border-0">
+                        <td className="px-4 py-2">
+                          <Link
+                            to="/tenants/$tenantId"
+                            params={{ tenantId: m.tenantId }}
+                            className="text-primary hover:underline"
+                          >
+                            {m.tenantName}
+                          </Link>
+                        </td>
+                        <td className="px-4 py-2">{m.memberCount}</td>
+                        <td className="px-4 py-2">{m.activeRate30d}%</td>
+                        <td className="px-4 py-2">{m.workoutsPerMember30d}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Tenant Health Flags */}

@@ -40,6 +40,30 @@ describe("consentRecords", () => {
     expect(records).toHaveLength(2);
   });
 
+  test("listAll returns all consent records across users", async () => {
+    const t = convexTest(schema);
+
+    await t.run(async (ctx) => {
+      const alice = await ctx.db.insert("users", { name: "Alice", email: "alice@test.com" });
+      const bob = await ctx.db.insert("users", { name: "Bob", email: "bob@test.com" });
+      await ctx.db.insert("consent_records", {
+        userId: alice, type: "terms_of_service", versionAccepted: "1.0", timestamp: Date.now(),
+      });
+      await ctx.db.insert("consent_records", {
+        userId: bob, type: "privacy_policy", versionAccepted: "2.0", timestamp: Date.now(),
+      });
+    });
+
+    const asAlice = t.withIdentity({ email: "alice@test.com", subject: "user|alice" });
+    const all = await asAlice.query(api.consentRecords.listAll, {});
+    expect(all).toHaveLength(2);
+  });
+
+  test("listAll rejects unauthenticated request", async () => {
+    const t = convexTest(schema);
+    await expect(t.query(api.consentRecords.listAll, {})).rejects.toThrow();
+  });
+
   test("withdraw deletes own consent record", async () => {
     const t = convexTest(schema);
 

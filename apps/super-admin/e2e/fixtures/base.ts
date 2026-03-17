@@ -9,6 +9,15 @@ import { AuditLogPage } from "../page-objects/audit-log.page";
 import { ExercisesPage } from "../page-objects/exercises.page";
 import { BenchmarksPage } from "../page-objects/benchmarks.page";
 import { AnnouncementsPage } from "../page-objects/announcements.page";
+import { ModerationPage } from "../page-objects/moderation.page";
+import { SecurityEventsPage, ApiKeysPage } from "../page-objects/security.page";
+import {
+  CompliancePage,
+  LegalDocumentsPage,
+  AgeVerificationPage,
+} from "../page-objects/compliance.page";
+import { IntegrationsPage } from "../page-objects/integrations.page";
+import { ProvisionPage } from "../page-objects/provision.page";
 
 type Fixtures = {
   sidebar: SidebarPage;
@@ -21,6 +30,14 @@ type Fixtures = {
   exercisesPage: ExercisesPage;
   benchmarksPage: BenchmarksPage;
   announcementsPage: AnnouncementsPage;
+  moderationPage: ModerationPage;
+  securityEventsPage: SecurityEventsPage;
+  apiKeysPage: ApiKeysPage;
+  compliancePage: CompliancePage;
+  legalDocumentsPage: LegalDocumentsPage;
+  ageVerificationPage: AgeVerificationPage;
+  integrationsPage: IntegrationsPage;
+  provisionPage: ProvisionPage;
 };
 
 export const test = base.extend<Fixtures>({
@@ -53,6 +70,30 @@ export const test = base.extend<Fixtures>({
   },
   announcementsPage: async ({ page }, use) => {
     await use(new AnnouncementsPage(page));
+  },
+  moderationPage: async ({ page }, use) => {
+    await use(new ModerationPage(page));
+  },
+  securityEventsPage: async ({ page }, use) => {
+    await use(new SecurityEventsPage(page));
+  },
+  apiKeysPage: async ({ page }, use) => {
+    await use(new ApiKeysPage(page));
+  },
+  compliancePage: async ({ page }, use) => {
+    await use(new CompliancePage(page));
+  },
+  legalDocumentsPage: async ({ page }, use) => {
+    await use(new LegalDocumentsPage(page));
+  },
+  ageVerificationPage: async ({ page }, use) => {
+    await use(new AgeVerificationPage(page));
+  },
+  integrationsPage: async ({ page }, use) => {
+    await use(new IntegrationsPage(page));
+  },
+  provisionPage: async ({ page }, use) => {
+    await use(new ProvisionPage(page));
   },
 });
 

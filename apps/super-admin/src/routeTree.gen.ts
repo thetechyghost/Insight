@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
 import { Route as AuthenticatedFeatureFlagsRouteImport } from './routes/_authenticated/feature-flags'
 import { Route as AuthenticatedExercisesRouteImport } from './routes/_authenticated/exercises'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -19,7 +20,14 @@ import { Route as AuthenticatedBenchmarksRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAuditLogRouteImport } from './routes/_authenticated/audit-log'
 import { Route as AuthenticatedAnnouncementsRouteImport } from './routes/_authenticated/announcements'
 import { Route as AuthenticatedTenantsIndexRouteImport } from './routes/_authenticated/tenants/index'
+import { Route as AuthenticatedSecurityIndexRouteImport } from './routes/_authenticated/security/index'
+import { Route as AuthenticatedIntegrationsIndexRouteImport } from './routes/_authenticated/integrations/index'
+import { Route as AuthenticatedComplianceIndexRouteImport } from './routes/_authenticated/compliance/index'
+import { Route as AuthenticatedTenantsProvisionRouteImport } from './routes/_authenticated/tenants/provision'
 import { Route as AuthenticatedTenantsTenantIdRouteImport } from './routes/_authenticated/tenants/$tenantId'
+import { Route as AuthenticatedSecurityApiKeysRouteImport } from './routes/_authenticated/security/api-keys'
+import { Route as AuthenticatedComplianceLegalDocumentsRouteImport } from './routes/_authenticated/compliance/legal-documents'
+import { Route as AuthenticatedComplianceAgeVerificationRouteImport } from './routes/_authenticated/compliance/age-verification'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -33,6 +41,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedModerationRoute = AuthenticatedModerationRouteImport.update({
+  id: '/moderation',
+  path: '/moderation',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedFeatureFlagsRoute =
@@ -73,10 +86,52 @@ const AuthenticatedTenantsIndexRoute =
     path: '/tenants/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedSecurityIndexRoute =
+  AuthenticatedSecurityIndexRouteImport.update({
+    id: '/security/',
+    path: '/security/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedIntegrationsIndexRoute =
+  AuthenticatedIntegrationsIndexRouteImport.update({
+    id: '/integrations/',
+    path: '/integrations/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedComplianceIndexRoute =
+  AuthenticatedComplianceIndexRouteImport.update({
+    id: '/compliance/',
+    path: '/compliance/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTenantsProvisionRoute =
+  AuthenticatedTenantsProvisionRouteImport.update({
+    id: '/tenants/provision',
+    path: '/tenants/provision',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedTenantsTenantIdRoute =
   AuthenticatedTenantsTenantIdRouteImport.update({
     id: '/tenants/$tenantId',
     path: '/tenants/$tenantId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSecurityApiKeysRoute =
+  AuthenticatedSecurityApiKeysRouteImport.update({
+    id: '/security/api-keys',
+    path: '/security/api-keys',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedComplianceLegalDocumentsRoute =
+  AuthenticatedComplianceLegalDocumentsRouteImport.update({
+    id: '/compliance/legal-documents',
+    path: '/compliance/legal-documents',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedComplianceAgeVerificationRoute =
+  AuthenticatedComplianceAgeVerificationRouteImport.update({
+    id: '/compliance/age-verification',
+    path: '/compliance/age-verification',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 
@@ -89,8 +144,16 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/exercises': typeof AuthenticatedExercisesRoute
   '/feature-flags': typeof AuthenticatedFeatureFlagsRoute
+  '/moderation': typeof AuthenticatedModerationRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/compliance/age-verification': typeof AuthenticatedComplianceAgeVerificationRoute
+  '/compliance/legal-documents': typeof AuthenticatedComplianceLegalDocumentsRoute
+  '/security/api-keys': typeof AuthenticatedSecurityApiKeysRoute
   '/tenants/$tenantId': typeof AuthenticatedTenantsTenantIdRoute
+  '/tenants/provision': typeof AuthenticatedTenantsProvisionRoute
+  '/compliance/': typeof AuthenticatedComplianceIndexRoute
+  '/integrations/': typeof AuthenticatedIntegrationsIndexRoute
+  '/security/': typeof AuthenticatedSecurityIndexRoute
   '/tenants/': typeof AuthenticatedTenantsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -102,8 +165,16 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/exercises': typeof AuthenticatedExercisesRoute
   '/feature-flags': typeof AuthenticatedFeatureFlagsRoute
+  '/moderation': typeof AuthenticatedModerationRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/compliance/age-verification': typeof AuthenticatedComplianceAgeVerificationRoute
+  '/compliance/legal-documents': typeof AuthenticatedComplianceLegalDocumentsRoute
+  '/security/api-keys': typeof AuthenticatedSecurityApiKeysRoute
   '/tenants/$tenantId': typeof AuthenticatedTenantsTenantIdRoute
+  '/tenants/provision': typeof AuthenticatedTenantsProvisionRoute
+  '/compliance': typeof AuthenticatedComplianceIndexRoute
+  '/integrations': typeof AuthenticatedIntegrationsIndexRoute
+  '/security': typeof AuthenticatedSecurityIndexRoute
   '/tenants': typeof AuthenticatedTenantsIndexRoute
 }
 export interface FileRoutesById {
@@ -116,8 +187,16 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/exercises': typeof AuthenticatedExercisesRoute
   '/_authenticated/feature-flags': typeof AuthenticatedFeatureFlagsRoute
+  '/_authenticated/moderation': typeof AuthenticatedModerationRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/compliance/age-verification': typeof AuthenticatedComplianceAgeVerificationRoute
+  '/_authenticated/compliance/legal-documents': typeof AuthenticatedComplianceLegalDocumentsRoute
+  '/_authenticated/security/api-keys': typeof AuthenticatedSecurityApiKeysRoute
   '/_authenticated/tenants/$tenantId': typeof AuthenticatedTenantsTenantIdRoute
+  '/_authenticated/tenants/provision': typeof AuthenticatedTenantsProvisionRoute
+  '/_authenticated/compliance/': typeof AuthenticatedComplianceIndexRoute
+  '/_authenticated/integrations/': typeof AuthenticatedIntegrationsIndexRoute
+  '/_authenticated/security/': typeof AuthenticatedSecurityIndexRoute
   '/_authenticated/tenants/': typeof AuthenticatedTenantsIndexRoute
 }
 export interface FileRouteTypes {
@@ -131,8 +210,16 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/exercises'
     | '/feature-flags'
+    | '/moderation'
     | '/settings'
+    | '/compliance/age-verification'
+    | '/compliance/legal-documents'
+    | '/security/api-keys'
     | '/tenants/$tenantId'
+    | '/tenants/provision'
+    | '/compliance/'
+    | '/integrations/'
+    | '/security/'
     | '/tenants/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -144,8 +231,16 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/exercises'
     | '/feature-flags'
+    | '/moderation'
     | '/settings'
+    | '/compliance/age-verification'
+    | '/compliance/legal-documents'
+    | '/security/api-keys'
     | '/tenants/$tenantId'
+    | '/tenants/provision'
+    | '/compliance'
+    | '/integrations'
+    | '/security'
     | '/tenants'
   id:
     | '__root__'
@@ -157,8 +252,16 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/exercises'
     | '/_authenticated/feature-flags'
+    | '/_authenticated/moderation'
     | '/_authenticated/settings'
+    | '/_authenticated/compliance/age-verification'
+    | '/_authenticated/compliance/legal-documents'
+    | '/_authenticated/security/api-keys'
     | '/_authenticated/tenants/$tenantId'
+    | '/_authenticated/tenants/provision'
+    | '/_authenticated/compliance/'
+    | '/_authenticated/integrations/'
+    | '/_authenticated/security/'
     | '/_authenticated/tenants/'
   fileRoutesById: FileRoutesById
 }
@@ -188,6 +291,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/moderation': {
+      id: '/_authenticated/moderation'
+      path: '/moderation'
+      fullPath: '/moderation'
+      preLoaderRoute: typeof AuthenticatedModerationRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/feature-flags': {
@@ -239,11 +349,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTenantsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/security/': {
+      id: '/_authenticated/security/'
+      path: '/security'
+      fullPath: '/security/'
+      preLoaderRoute: typeof AuthenticatedSecurityIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/integrations/': {
+      id: '/_authenticated/integrations/'
+      path: '/integrations'
+      fullPath: '/integrations/'
+      preLoaderRoute: typeof AuthenticatedIntegrationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/compliance/': {
+      id: '/_authenticated/compliance/'
+      path: '/compliance'
+      fullPath: '/compliance/'
+      preLoaderRoute: typeof AuthenticatedComplianceIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/tenants/provision': {
+      id: '/_authenticated/tenants/provision'
+      path: '/tenants/provision'
+      fullPath: '/tenants/provision'
+      preLoaderRoute: typeof AuthenticatedTenantsProvisionRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/tenants/$tenantId': {
       id: '/_authenticated/tenants/$tenantId'
       path: '/tenants/$tenantId'
       fullPath: '/tenants/$tenantId'
       preLoaderRoute: typeof AuthenticatedTenantsTenantIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/security/api-keys': {
+      id: '/_authenticated/security/api-keys'
+      path: '/security/api-keys'
+      fullPath: '/security/api-keys'
+      preLoaderRoute: typeof AuthenticatedSecurityApiKeysRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/compliance/legal-documents': {
+      id: '/_authenticated/compliance/legal-documents'
+      path: '/compliance/legal-documents'
+      fullPath: '/compliance/legal-documents'
+      preLoaderRoute: typeof AuthenticatedComplianceLegalDocumentsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/compliance/age-verification': {
+      id: '/_authenticated/compliance/age-verification'
+      path: '/compliance/age-verification'
+      fullPath: '/compliance/age-verification'
+      preLoaderRoute: typeof AuthenticatedComplianceAgeVerificationRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
   }
@@ -256,8 +415,16 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExercisesRoute: typeof AuthenticatedExercisesRoute
   AuthenticatedFeatureFlagsRoute: typeof AuthenticatedFeatureFlagsRoute
+  AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedComplianceAgeVerificationRoute: typeof AuthenticatedComplianceAgeVerificationRoute
+  AuthenticatedComplianceLegalDocumentsRoute: typeof AuthenticatedComplianceLegalDocumentsRoute
+  AuthenticatedSecurityApiKeysRoute: typeof AuthenticatedSecurityApiKeysRoute
   AuthenticatedTenantsTenantIdRoute: typeof AuthenticatedTenantsTenantIdRoute
+  AuthenticatedTenantsProvisionRoute: typeof AuthenticatedTenantsProvisionRoute
+  AuthenticatedComplianceIndexRoute: typeof AuthenticatedComplianceIndexRoute
+  AuthenticatedIntegrationsIndexRoute: typeof AuthenticatedIntegrationsIndexRoute
+  AuthenticatedSecurityIndexRoute: typeof AuthenticatedSecurityIndexRoute
   AuthenticatedTenantsIndexRoute: typeof AuthenticatedTenantsIndexRoute
 }
 
@@ -268,8 +435,18 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExercisesRoute: AuthenticatedExercisesRoute,
   AuthenticatedFeatureFlagsRoute: AuthenticatedFeatureFlagsRoute,
+  AuthenticatedModerationRoute: AuthenticatedModerationRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedComplianceAgeVerificationRoute:
+    AuthenticatedComplianceAgeVerificationRoute,
+  AuthenticatedComplianceLegalDocumentsRoute:
+    AuthenticatedComplianceLegalDocumentsRoute,
+  AuthenticatedSecurityApiKeysRoute: AuthenticatedSecurityApiKeysRoute,
   AuthenticatedTenantsTenantIdRoute: AuthenticatedTenantsTenantIdRoute,
+  AuthenticatedTenantsProvisionRoute: AuthenticatedTenantsProvisionRoute,
+  AuthenticatedComplianceIndexRoute: AuthenticatedComplianceIndexRoute,
+  AuthenticatedIntegrationsIndexRoute: AuthenticatedIntegrationsIndexRoute,
+  AuthenticatedSecurityIndexRoute: AuthenticatedSecurityIndexRoute,
   AuthenticatedTenantsIndexRoute: AuthenticatedTenantsIndexRoute,
 }
 

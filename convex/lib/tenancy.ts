@@ -61,8 +61,6 @@ export function hasMinimumRole(userRole: Role, minimumRole: Role): boolean {
  */
 export function requireRole(userRole: Role, minimumRole: Role): void {
   if (!hasMinimumRole(userRole, minimumRole)) {
-    throw new ConvexError(
-      `Insufficient role. Required: ${minimumRole}, your role: ${userRole}`
-    );
+    throw new ConvexError("Insufficient permissions");
   }
 }

@@ -19,6 +19,51 @@ const provisioningDoc = v.object({
 });
 
 // ============================================================================
+// create — initiate a new tenant provisioning request
+// ============================================================================
+
+export const create = authedMutation({
+  args: {
+    tenantName: v.string(),
+    tenantSlug: v.string(),
+    contactEmail: v.string(),
+    checklistState: v.optional(v.any()),
+  },
+  returns: v.object({
+    provisioningId: v.id("tenant_provisioning"),
+    tenantId: v.id("tenants"),
+  }),
+  handler: async (ctx, args) => {
+    if (!args.tenantName.trim()) throw new ConvexError("Tenant name is required");
+    if (!args.tenantSlug.trim()) throw new ConvexError("Tenant slug is required");
+
+    // Check slug uniqueness
+    const existing = await ctx.db
+      .query("tenants")
+      .withIndex("by_slug", (q) => q.eq("slug", args.tenantSlug))
+      .unique();
+    if (existing) throw new ConvexError("Slug already in use");
+
+    // Create the tenant
+    const tenantId = await ctx.db.insert("tenants", {
+      name: args.tenantName,
+      slug: args.tenantSlug,
+      contactInfo: { email: args.contactEmail },
+    });
+
+    // Create the provisioning record
+    const provisioningId = await ctx.db.insert("tenant_provisioning", {
+      requestedBy: ctx.userId,
+      tenantId,
+      status: "pending",
+      checklistState: args.checklistState,
+    });
+
+    return { provisioningId, tenantId };
+  },
+});
+
+// ============================================================================
 // list — list provisioning records, optionally filtered by status
 // ============================================================================
 

@@ -5,6 +5,53 @@ import { api, internal } from "./_generated/api";
 const http = httpRouter();
 
 // ============================================================================
+// JWKS endpoint for test JWT authentication
+// Used by auth.config.ts (domain: http://localhost:3211) to verify RS256 tokens
+// in local integration tests. The key pair is committed — it is a test-only key.
+// ============================================================================
+
+const TEST_JWKS = {
+  keys: [
+    {
+      kty: "RSA",
+      use: "sig",
+      alg: "RS256",
+      kid: "insight-test-key-1",
+      n: "qtnWyqWxZ0nL_cRvTpGq1NW321UqajxDq2T4TFmR4w63rqs6Rvrzqmld6AuKJVvQgkrOiT1HJPvXMQ0onaVHTtylB391nS45AM3u6jJsuuK4MwX3-9bw8qsqxXAVEr6pSprouUciyPbHypvRXc1nbstNx3fWYLojRsW3L2QjyqPPkBBNq2spx9kLH_nSKYzgu99wY-9BMTFA70vi_4ilQgcV7mUCvddrPBLw8GtZRguB_EL7iZi0CDqsMhPRTqkKMWP9MDjlmmQOOoaztsjO7vJMnnhikrHsE0Mn9AJjj2fu9UYcnLnQdl6bZxsi9EVH9Rx6w-cEnAyzqJ_BJ-s3mQ",
+      e: "AQAB",
+    },
+  ],
+};
+
+http.route({
+  path: "/.well-known/jwks.json",
+  method: "GET",
+  handler: httpAction(async () => {
+    return new Response(JSON.stringify(TEST_JWKS), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }),
+});
+
+http.route({
+  path: "/.well-known/openid-configuration",
+  method: "GET",
+  handler: httpAction(async () => {
+    // The issuer must match `domain` in auth.config.ts and the `iss` JWT claim.
+    // Hardcoded to localhost:3211 for the local Docker test environment.
+    const config = {
+      issuer: "http://localhost:3211",
+      jwks_uri: "http://localhost:3211/.well-known/jwks.json",
+    };
+    return new Response(JSON.stringify(config), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }),
+});
+
+// ============================================================================
 // Test helpers
 // ============================================================================
 

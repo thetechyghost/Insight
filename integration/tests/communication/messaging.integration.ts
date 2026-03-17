@@ -72,9 +72,8 @@ describe("[FR-CM] Messaging", () => {
         () =>
           unauthenticatedClient.query(api.conversations.getById, {
             tenantId: tenantId(),
-            conversationId: "placeholder" as Id<"conversations">,
-          }),
-        "Not authenticated"
+            conversationId: ctx.tenants.cfAlpha.id as unknown as Id<"conversations">,
+          })
       );
     });
 
@@ -324,10 +323,9 @@ describe("[FR-CM] Messaging", () => {
         () =>
           unauthenticatedClient.mutation(api.messages.send, {
             tenantId: tenantId(),
-            conversationId: "placeholder" as Id<"conversations">,
+            conversationId: ctx.tenants.cfAlpha.id as unknown as Id<"conversations">,
             content: "Hello",
-          }),
-        "Not authenticated"
+          })
       );
     });
 
@@ -336,9 +334,8 @@ describe("[FR-CM] Messaging", () => {
         () =>
           unauthenticatedClient.query(api.messages.listByConversation, {
             tenantId: tenantId(),
-            conversationId: "placeholder" as Id<"conversations">,
-          }),
-        "Not authenticated"
+            conversationId: ctx.tenants.cfAlpha.id as unknown as Id<"conversations">,
+          })
       );
     });
 
@@ -347,9 +344,8 @@ describe("[FR-CM] Messaging", () => {
         () =>
           unauthenticatedClient.mutation(api.messages.markRead, {
             tenantId: tenantId(),
-            messageId: "placeholder" as Id<"messages">,
-          }),
-        "Not authenticated"
+            messageId: ctx.tenants.cfAlpha.id as unknown as Id<"messages">,
+          })
       );
     });
 

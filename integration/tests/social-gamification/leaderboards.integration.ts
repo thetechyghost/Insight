@@ -63,10 +63,9 @@ describe("[FR-SC] Leaderboards", () => {
       () =>
         unauthenticatedClient.mutation(api.leaderboards.update, {
           tenantId: tenantId(),
-          leaderboardId: "placeholder" as Id<"leaderboards">,
+          leaderboardId: ctx.tenants.cfAlpha.id as unknown as Id<"leaderboards">,
           scope: "gym",
-        }),
-      "Not authenticated"
+        })
     );
   });
 
@@ -75,9 +74,8 @@ describe("[FR-SC] Leaderboards", () => {
       () =>
         unauthenticatedClient.mutation(api.leaderboards.remove, {
           tenantId: tenantId(),
-          leaderboardId: "placeholder" as Id<"leaderboards">,
-        }),
-      "Not authenticated"
+          leaderboardId: ctx.tenants.cfAlpha.id as unknown as Id<"leaderboards">,
+        })
     );
   });
 

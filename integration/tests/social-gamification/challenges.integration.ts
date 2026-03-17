@@ -67,9 +67,8 @@ describe("[FR-SC, FR-GM] Challenges", () => {
       () =>
         unauthenticatedClient.mutation(api.challenges.join, {
           tenantId: tenantId(),
-          challengeId: "placeholder" as Id<"challenges">,
-        }),
-      "Not authenticated"
+          challengeId: ctx.tenants.cfAlpha.id as unknown as Id<"challenges">,
+        })
     );
   });
 

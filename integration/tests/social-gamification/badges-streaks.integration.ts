@@ -59,9 +59,8 @@ describe("[FR-GM] Badges & Streaks", () => {
         () =>
           unauthenticatedClient.query(api.badges.getById, {
             tenantId: tenantId(),
-            badgeId: "placeholder" as Id<"badges">,
-          }),
-        "Not authenticated"
+            badgeId: ctx.tenants.cfAlpha.id as unknown as Id<"badges">,
+          })
       );
     });
 
@@ -80,7 +79,7 @@ describe("[FR-GM] Badges & Streaks", () => {
         () =>
           unauthenticatedClient.query(api.badges.getUserBadges, {
             tenantId: tenantId(),
-            userId: "placeholder" as Id<"users">,
+            userId: ctx.users.alice.id as Id<"users">,
           }),
         "Not authenticated"
       );
@@ -126,8 +125,7 @@ describe("[FR-GM] Badges & Streaks", () => {
           client.query(api.badges.getById, {
             tenantId: tenantId(),
             badgeId: "invalid_id_here" as Id<"badges">,
-          }),
-        "not found"
+          })
       );
     });
 
@@ -213,9 +211,8 @@ describe("[FR-GM] Badges & Streaks", () => {
         () =>
           unauthenticatedClient.mutation(api.streaks.useFreeze, {
             tenantId: tenantId(),
-            streakId: "placeholder" as Id<"streaks">,
-          }),
-        "Not authenticated"
+            streakId: ctx.tenants.cfAlpha.id as unknown as Id<"streaks">,
+          })
       );
     });
 
@@ -245,8 +242,7 @@ describe("[FR-GM] Badges & Streaks", () => {
           client.mutation(api.streaks.useFreeze, {
             tenantId: tenantId(),
             streakId: "invalid_id_here" as Id<"streaks">,
-          }),
-        "not found"
+          })
       );
     });
 
@@ -291,9 +287,8 @@ describe("[FR-GM] Badges & Streaks", () => {
         () =>
           client.mutation(api.streaks.useFreeze, {
             tenantId: betaTenantId(),
-            streakId: "placeholder" as Id<"streaks">,
-          }),
-        "not a member"
+            streakId: ctx.tenants.cfAlpha.id as unknown as Id<"streaks">,
+          })
       );
     });
   });

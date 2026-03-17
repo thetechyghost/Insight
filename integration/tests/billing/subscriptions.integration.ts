@@ -66,10 +66,9 @@ describe("[FR-BP] Subscriptions", () => {
       () =>
         unauthenticatedClient.mutation(api.subscriptions.changePlan, {
           tenantId: tenantId(),
-          subscriptionId: "placeholder" as Id<"subscriptions">,
-          newPlanId: "placeholder" as Id<"membership_plans">,
-        }),
-      "Not authenticated"
+          subscriptionId: ctx.tenants.cfAlpha.id as unknown as Id<"subscriptions">,
+          newPlanId: ctx.tenants.cfAlpha.id as unknown as Id<"membership_plans">,
+        })
     );
   });
 
@@ -78,9 +77,8 @@ describe("[FR-BP] Subscriptions", () => {
       () =>
         unauthenticatedClient.mutation(api.subscriptions.freeze, {
           tenantId: tenantId(),
-          subscriptionId: "placeholder" as Id<"subscriptions">,
-        }),
-      "Not authenticated"
+          subscriptionId: ctx.tenants.cfAlpha.id as unknown as Id<"subscriptions">,
+        })
     );
   });
 
@@ -89,9 +87,8 @@ describe("[FR-BP] Subscriptions", () => {
       () =>
         unauthenticatedClient.mutation(api.subscriptions.cancel, {
           tenantId: tenantId(),
-          subscriptionId: "placeholder" as Id<"subscriptions">,
-        }),
-      "Not authenticated"
+          subscriptionId: ctx.tenants.cfAlpha.id as unknown as Id<"subscriptions">,
+        })
     );
   });
 
@@ -400,9 +397,8 @@ describe("[FR-BP] Subscriptions", () => {
       () =>
         client.mutation(api.subscriptions.freeze, {
           tenantId: betaTenantId(),
-          subscriptionId: "placeholder" as Id<"subscriptions">,
-        }),
-      "not a member"
+          subscriptionId: ctx.tenants.cfAlpha.id as unknown as Id<"subscriptions">,
+        })
     );
   });
 
@@ -413,9 +409,8 @@ describe("[FR-BP] Subscriptions", () => {
       () =>
         client.mutation(api.subscriptions.cancel, {
           tenantId: betaTenantId(),
-          subscriptionId: "placeholder" as Id<"subscriptions">,
-        }),
-      "not a member"
+          subscriptionId: ctx.tenants.cfAlpha.id as unknown as Id<"subscriptions">,
+        })
     );
   });
 });

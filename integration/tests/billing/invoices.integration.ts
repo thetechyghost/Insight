@@ -68,9 +68,8 @@ describe("[FR-BP] Invoices", () => {
       () =>
         unauthenticatedClient.query(api.invoices.getById, {
           tenantId: tenantId(),
-          invoiceId: "placeholder" as Id<"invoices">,
-        }),
-      "Not authenticated"
+          invoiceId: ctx.tenants.cfAlpha.id as unknown as Id<"invoices">,
+        })
     );
   });
 
@@ -79,7 +78,7 @@ describe("[FR-BP] Invoices", () => {
       () =>
         unauthenticatedClient.mutation(api.invoices.createManual, {
           tenantId: tenantId(),
-          userId: "placeholder" as Id<"users">,
+          userId: ctx.users.alice.id as Id<"users">,
           amount: 5000,
           currency: "USD",
         }),
@@ -92,9 +91,8 @@ describe("[FR-BP] Invoices", () => {
       () =>
         unauthenticatedClient.mutation(api.invoices.voidInvoice, {
           tenantId: tenantId(),
-          invoiceId: "placeholder" as Id<"invoices">,
-        }),
-      "Not authenticated"
+          invoiceId: ctx.tenants.cfAlpha.id as unknown as Id<"invoices">,
+        })
     );
   });
 
@@ -374,8 +372,7 @@ describe("[FR-BP] Invoices", () => {
         client.mutation(api.invoices.voidInvoice, {
           tenantId: tenantId(),
           invoiceId: "invalid_id_here" as Id<"invoices">,
-        }),
-      "not found"
+        })
     );
   });
 

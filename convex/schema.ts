@@ -241,8 +241,9 @@ export default defineSchema({
       v.literal("weightlifting"), v.literal("gymnastics"),
       v.literal("monostructural"), v.literal("other"),
     ),
-    equipment: v.array(v.string()),
-    muscleGroups: v.array(v.string()),
+    equipment: v.optional(v.array(v.string())),
+    muscleGroups: v.optional(v.array(v.string())),
+    instructions: v.optional(v.string()),
     demoVideoStorageIds: v.optional(v.array(v.id("_storage"))),
     aliases: v.optional(v.array(v.string())),
     scalingAlternatives: v.optional(v.array(v.string())),
@@ -355,6 +356,7 @@ export default defineSchema({
     phaseLabels: v.optional(v.array(v.string())),
     tenantId: v.optional(v.id("tenants")),
     price: v.optional(v.number()),
+    currency: v.optional(v.string()),
     publishedStatus: v.optional(
       v.union(v.literal("draft"), v.literal("published"), v.literal("archived"))
     ),
@@ -395,6 +397,7 @@ export default defineSchema({
     leftCalf: v.optional(v.number()),
     rightCalf: v.optional(v.number()),
     neck: v.optional(v.number()),
+    notes: v.optional(v.string()),
   })
     .index("by_userId_tenantId", ["userId", "tenantId"])
     .index("by_userId_date", ["userId", "date"]),

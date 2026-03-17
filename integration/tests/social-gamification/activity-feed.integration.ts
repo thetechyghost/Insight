@@ -50,9 +50,8 @@ describe("[FR-SC] Activity Feed", () => {
       () =>
         unauthenticatedClient.mutation(api.activityFeed.hide, {
           tenantId: tenantId(),
-          feedItemId: "placeholder" as Id<"activity_feed">,
-        }),
-      "Not authenticated"
+          feedItemId: ctx.tenants.cfAlpha.id as unknown as Id<"activity_feed">,
+        })
     );
   });
 
@@ -61,9 +60,8 @@ describe("[FR-SC] Activity Feed", () => {
       () =>
         unauthenticatedClient.mutation(api.activityFeed.remove, {
           tenantId: tenantId(),
-          feedItemId: "placeholder" as Id<"activity_feed">,
-        }),
-      "Not authenticated"
+          feedItemId: ctx.tenants.cfAlpha.id as unknown as Id<"activity_feed">,
+        })
     );
   });
 

@@ -41,7 +41,10 @@
       "Bash(/Users/casper/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.2/skills/brainstorming/scripts/start-server.sh --project-dir /Users/casper/Projects/Insight)",
       "WebFetch(domain:ui.shadcn.com)",
       "Bash(/Users/casper/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.2/skills/brainstorming/scripts/stop-server.sh /Users/casper/Projects/Insight/.superpowers/brainstorm/94470-1773629746)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(npx playwright:*)",
+      "WebFetch(domain:stack.convex.dev)",
+      "Bash(docker compose:*)"
     ]
   }
 }

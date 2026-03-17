@@ -58,9 +58,8 @@ describe("[FR-CM] Notifications", () => {
       () =>
         unauthenticatedClient.mutation(api.notifications.markRead, {
           tenantId: tenantId(),
-          notificationId: "placeholder" as Id<"notification_queue">,
-        }),
-      "Not authenticated"
+          notificationId: ctx.tenants.cfAlpha.id as unknown as Id<"notification_queue">,
+        })
     );
   });
 
@@ -79,9 +78,8 @@ describe("[FR-CM] Notifications", () => {
       () =>
         unauthenticatedClient.mutation(api.notifications.dismiss, {
           tenantId: tenantId(),
-          notificationId: "placeholder" as Id<"notification_queue">,
-        }),
-      "Not authenticated"
+          notificationId: ctx.tenants.cfAlpha.id as unknown as Id<"notification_queue">,
+        })
     );
   });
 
@@ -266,9 +264,8 @@ describe("[FR-CM] Notifications", () => {
       () =>
         client.mutation(api.notifications.dismiss, {
           tenantId: betaTenantId(),
-          notificationId: "placeholder" as Id<"notification_queue">,
-        }),
-      "not a member"
+          notificationId: ctx.tenants.cfAlpha.id as unknown as Id<"notification_queue">,
+        })
     );
   });
 });

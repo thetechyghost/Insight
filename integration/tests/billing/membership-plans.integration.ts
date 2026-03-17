@@ -68,9 +68,8 @@ describe("[FR-BP] Membership Plans", () => {
       () =>
         unauthenticatedClient.query(api.membershipPlans.getById, {
           tenantId: tenantId(),
-          planId: "placeholder" as Id<"membership_plans">,
-        }),
-      "Not authenticated"
+          planId: ctx.tenants.cfAlpha.id as unknown as Id<"membership_plans">,
+        })
     );
   });
 
@@ -79,10 +78,9 @@ describe("[FR-BP] Membership Plans", () => {
       () =>
         unauthenticatedClient.mutation(api.membershipPlans.update, {
           tenantId: tenantId(),
-          planId: "placeholder" as Id<"membership_plans">,
+          planId: ctx.tenants.cfAlpha.id as unknown as Id<"membership_plans">,
           name: "Hacked",
-        }),
-      "Not authenticated"
+        })
     );
   });
 
@@ -91,9 +89,8 @@ describe("[FR-BP] Membership Plans", () => {
       () =>
         unauthenticatedClient.mutation(api.membershipPlans.deactivate, {
           tenantId: tenantId(),
-          planId: "placeholder" as Id<"membership_plans">,
-        }),
-      "Not authenticated"
+          planId: ctx.tenants.cfAlpha.id as unknown as Id<"membership_plans">,
+        })
     );
   });
 

@@ -35,17 +35,21 @@ function TenantDetailPage() {
 
   const suspendMutation = useMutation(api.platformTenants.suspend);
   const reactivateMutation = useMutation(api.platformTenants.reactivate);
+  const terminateMutation = useMutation(api.platformTenants.terminate);
   const createNote = useMutation(api.platformTenantNotes.create);
 
   const [suspendOpen, setSuspendOpen] = useState(false);
   const [reactivateOpen, setReactivateOpen] = useState(false);
+  const [terminateOpen, setTerminateOpen] = useState(false);
   const [reason, setReason] = useState("");
+  const [confirmSlug, setConfirmSlug] = useState("");
   const [noteContent, setNoteContent] = useState("");
 
   if (!data) return <div className="text-muted-foreground">Loading...</div>;
 
   const { tenant, provisioningStatus, memberCount, ownerInfo } = data;
   const isSuspended = provisioningStatus === "suspended";
+  const isTerminated = provisioningStatus === "terminated";
 
   async function handleSuspend() {
     await suspendMutation({
@@ -65,6 +69,17 @@ function TenantDetailPage() {
     setReason("");
   }
 
+  async function handleTerminate() {
+    await terminateMutation({
+      tenantId: tenantId as Id<"tenants">,
+      reason,
+      confirmSlug,
+    });
+    setTerminateOpen(false);
+    setReason("");
+    setConfirmSlug("");
+  }
+
   async function handleAddNote() {
     if (!noteContent.trim()) return;
     await createNote({
@@ -77,6 +92,7 @@ function TenantDetailPage() {
   const statusVariant: Record<string, "default" | "destructive" | "secondary"> = {
     active: "default",
     suspended: "destructive",
+    terminated: "destructive",
     pending: "secondary",
     approved: "secondary",
   };
@@ -103,18 +119,28 @@ function TenantDetailPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          {isSuspended ? (
-            <Button variant="outline" onClick={() => setReactivateOpen(true)}>
-              Reactivate
-            </Button>
-          ) : (
-            <Button
-              variant="outline"
-              className="text-yellow-600 border-yellow-600/30"
-              onClick={() => setSuspendOpen(true)}
-            >
-              Suspend
-            </Button>
+          {!isTerminated && (
+            <>
+              {isSuspended ? (
+                <Button variant="outline" onClick={() => setReactivateOpen(true)}>
+                  Reactivate
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="text-yellow-600 border-yellow-600/30"
+                  onClick={() => setSuspendOpen(true)}
+                >
+                  Suspend
+                </Button>
+              )}
+              <Button
+                variant="destructive"
+                onClick={() => setTerminateOpen(true)}
+              >
+                Terminate
+              </Button>
+            </>
           )}
         </div>
       </div>
@@ -171,19 +197,11 @@ function TenantDetailPage() {
         </TabsContent>
 
         <TabsContent value="members" className="mt-4">
-          <Card>
-            <CardContent className="pt-6 text-sm text-muted-foreground">
-              Member list — coming in a future iteration.
-            </CardContent>
-          </Card>
+          <MembersTab tenantId={tenantId as Id<"tenants">} />
         </TabsContent>
 
         <TabsContent value="usage" className="mt-4">
-          <Card>
-            <CardContent className="pt-6 text-sm text-muted-foreground">
-              Usage analytics — coming in a future iteration.
-            </CardContent>
-          </Card>
+          <UsageTab tenantId={tenantId as Id<"tenants">} />
         </TabsContent>
 
         <TabsContent value="notes" className="mt-4 space-y-4">
@@ -266,6 +284,106 @@ function TenantDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Terminate Dialog */}
+      <Dialog open={terminateOpen} onOpenChange={setTerminateOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Terminate Tenant</DialogTitle>
+            <DialogDescription>
+              This will permanently deactivate {tenant.name} and cancel all memberships.
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="terminate-reason">Reason (required)</Label>
+              <Input
+                id="terminate-reason"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Business closed, contract ended, etc."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="terminate-confirm">
+                Type <span className="font-mono font-bold">{tenant.slug}</span> to confirm
+              </Label>
+              <Input
+                id="terminate-confirm"
+                value={confirmSlug}
+                onChange={(e) => setConfirmSlug(e.target.value)}
+                placeholder={tenant.slug}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setTerminateOpen(false); setConfirmSlug(""); setReason(""); }}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleTerminate}
+              disabled={!reason.trim() || confirmSlug !== tenant.slug}
+            >
+              Terminate Permanently
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function MembersTab({ tenantId }: { tenantId: Id<"tenants"> }) {
+  const result = useQuery(api.platformTenants.getMembers, { tenantId });
+
+  if (!result) return <div className="text-muted-foreground">Loading...</div>;
+
+  if (result.members.length === 0) {
+    return <p className="text-sm text-muted-foreground">No members found.</p>;
+  }
+
+  return (
+    <div className="rounded-md border">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b">
+            <th className="text-left px-4 py-2 font-medium">Name</th>
+            <th className="text-left px-4 py-2 font-medium">Email</th>
+            <th className="text-left px-4 py-2 font-medium">Role</th>
+            <th className="text-left px-4 py-2 font-medium">Status</th>
+            <th className="text-left px-4 py-2 font-medium">Joined</th>
+          </tr>
+        </thead>
+        <tbody>
+          {result.members.map((m) => (
+            <tr key={m.membershipId} className="border-b last:border-0">
+              <td className="px-4 py-2">{m.name}</td>
+              <td className="px-4 py-2 text-muted-foreground">{m.email}</td>
+              <td className="px-4 py-2 capitalize">{m.role}</td>
+              <td className="px-4 py-2 capitalize">{m.status}</td>
+              <td className="px-4 py-2">{m.joinDate}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function UsageTab({ tenantId }: { tenantId: Id<"tenants"> }) {
+  const activity = useQuery(api.platformMetrics.getTenantActivity, { tenantId });
+
+  if (!activity) return <div className="text-muted-foreground">Loading...</div>;
+
+  return (
+    <div className="grid gap-4 md:grid-cols-3">
+      <StatCard title="Total Members" value={activity.totalMembers} />
+      <StatCard title="Active Users (7d)" value={activity.activeUsers7d} />
+      <StatCard title="Active Users (30d)" value={activity.activeUsers30d} />
+      <StatCard title="Workouts (30d)" value={activity.totalWorkoutLogs30d} />
+      <StatCard title="Logins (7d)" value={activity.loginCount7d} />
     </div>
   );
 }

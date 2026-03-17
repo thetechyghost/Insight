@@ -119,3 +119,115 @@ export const getTenantHealthFlags = platformQuery({
     return flags;
   },
 });
+
+// ============================================================================
+// getTenantActivity — per-tenant activity metrics (FR-AD-009)
+// ============================================================================
+
+export const getTenantActivity = platformQuery({
+  args: { tenantId: v.id("tenants") },
+  returns: v.object({
+    totalMembers: v.number(),
+    activeUsers7d: v.number(),
+    activeUsers30d: v.number(),
+    totalWorkoutLogs30d: v.number(),
+    loginCount7d: v.number(),
+  }),
+  handler: async (ctx, args) => {
+    const tenant = await ctx.db.get(args.tenantId);
+    if (!tenant) {
+      return { totalMembers: 0, activeUsers7d: 0, activeUsers30d: 0, totalWorkoutLogs30d: 0, loginCount7d: 0 };
+    }
+
+    const now = Date.now();
+    const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+    const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
+
+    // Get tenant members
+    const memberships = await ctx.db
+      .query("memberships")
+      .withIndex("by_tenantId_status", (q) => q.eq("tenantId", args.tenantId).eq("status", "active"))
+      .collect();
+    const memberUserIds = new Set(memberships.map((m) => m.userId));
+
+    // Login events for tenant members
+    const loginEvents = await ctx.db
+      .query("security_events")
+      .withIndex("by_eventType", (q) => q.eq("eventType", "login_success"))
+      .collect();
+    const memberLogins = loginEvents.filter((e) => e.userId && memberUserIds.has(e.userId));
+
+    const logins7d = memberLogins.filter((e) => e.timestamp >= sevenDaysAgo);
+    const logins30d = memberLogins.filter((e) => e.timestamp >= thirtyDaysAgo);
+
+    const activeUsers7d = new Set(logins7d.map((e) => e.userId).filter(Boolean)).size;
+    const activeUsers30d = new Set(logins30d.map((e) => e.userId).filter(Boolean)).size;
+
+    // Workout logs (by tenant members in last 30 days)
+    const workoutLogs = await ctx.db.query("workout_logs").collect();
+    const tenantWorkouts30d = workoutLogs.filter(
+      (w) => memberUserIds.has(w.userId) && w._creationTime >= thirtyDaysAgo
+    );
+
+    return {
+      totalMembers: memberships.length,
+      activeUsers7d,
+      activeUsers30d,
+      totalWorkoutLogs30d: tenantWorkouts30d.length,
+      loginCount7d: logins7d.length,
+    };
+  },
+});
+
+// ============================================================================
+// getComparativeMetrics — cross-tenant comparison (FR-AD-011)
+// ============================================================================
+
+export const getComparativeMetrics = platformQuery({
+  args: {},
+  returns: v.array(v.object({
+    tenantId: v.id("tenants"),
+    tenantName: v.string(),
+    memberCount: v.number(),
+    activeRate30d: v.number(),
+    workoutsPerMember30d: v.number(),
+  })),
+  handler: async (ctx) => {
+    const now = Date.now();
+    const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
+
+    const tenants = await ctx.db.query("tenants").collect();
+    const allMemberships = await ctx.db.query("memberships").collect();
+    const loginEvents = await ctx.db
+      .query("security_events")
+      .withIndex("by_eventType", (q) => q.eq("eventType", "login_success"))
+      .collect();
+    const recentLogins = loginEvents.filter((e) => e.timestamp >= thirtyDaysAgo);
+    const workoutLogs = await ctx.db.query("workout_logs").collect();
+    const recentWorkouts = workoutLogs.filter((w) => w._creationTime >= thirtyDaysAgo);
+
+    return tenants.map((tenant) => {
+      const members = allMemberships.filter(
+        (m) => m.tenantId === tenant._id && m.status === "active"
+      );
+      const memberUserIds = new Set(members.map((m) => m.userId));
+      const memberCount = members.length;
+
+      const activeUsers = new Set(
+        recentLogins
+          .filter((e) => e.userId && memberUserIds.has(e.userId))
+          .map((e) => e.userId)
+      ).size;
+
+      const tenantWorkouts = recentWorkouts.filter((w) => memberUserIds.has(w.userId)).length;
+
+      return {
+        tenantId: tenant._id,
+        tenantName: tenant.name,
+        memberCount,
+        activeRate30d: memberCount > 0 ? Math.round((activeUsers / memberCount) * 100) : 0,
+        workoutsPerMember30d: memberCount > 0 ? Math.round((tenantWorkouts / memberCount) * 10) / 10 : 0,
+      };
+    });
+  },
+});

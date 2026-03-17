@@ -44,7 +44,15 @@
       "Bash(cd:*)",
       "Bash(npx playwright:*)",
       "WebFetch(domain:stack.convex.dev)",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(CONVEX_SELF_HOSTED_URL=http://localhost:3210 CONVEX_SELF_HOSTED_ADMIN_KEY=\"convex-self-hosted|016b8e6b8d5bcd93dbbc5efd0b41858ee3cf2bcb66d9a694bf5565b2db7572582ad346965f\" npx convex deploy --yes --typecheck=disable)",
+      "Bash(curl:*)",
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "Bash(npx tsr:*)",
+      "Bash(npx vite:*)"
     ]
   }
 }

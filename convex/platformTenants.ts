@@ -9,7 +9,7 @@ import { internal } from "./_generated/api";
 export const list = platformQuery({
   args: {
     status: v.optional(v.union(
-      v.literal("pending"), v.literal("approved"), v.literal("active"), v.literal("suspended")
+      v.literal("pending"), v.literal("approved"), v.literal("active"), v.literal("suspended"), v.literal("terminated")
     )),
     search: v.optional(v.string()),
     cursor: v.optional(v.string()),
@@ -25,7 +25,7 @@ export const list = platformQuery({
       _creationTime: v.number(),
       memberCount: v.number(),
       provisioningStatus: v.union(
-        v.literal("pending"), v.literal("approved"), v.literal("active"), v.literal("suspended")
+        v.literal("pending"), v.literal("approved"), v.literal("active"), v.literal("suspended"), v.literal("terminated")
       ),
     })),
     nextCursor: v.optional(v.string()),
@@ -57,7 +57,7 @@ export const list = platformQuery({
           timezone: tenant.timezone,
           _creationTime: tenant._creationTime,
           memberCount: members.length,
-          provisioningStatus: (provisioning?.status ?? "pending") as "pending" | "approved" | "active" | "suspended",
+          provisioningStatus: (provisioning?.status ?? "pending") as "pending" | "approved" | "active" | "suspended" | "terminated",
         };
       })
     );
@@ -95,7 +95,7 @@ export const getById = platformQuery({
   returns: v.object({
     tenant: v.any(),
     provisioningStatus: v.union(
-      v.literal("pending"), v.literal("approved"), v.literal("active"), v.literal("suspended")
+      v.literal("pending"), v.literal("approved"), v.literal("active"), v.literal("suspended"), v.literal("terminated")
     ),
     memberCount: v.number(),
     ownerInfo: v.optional(v.object({
@@ -129,7 +129,7 @@ export const getById = platformQuery({
 
     return {
       tenant,
-      provisioningStatus: (provisioning?.status ?? "pending") as "pending" | "approved" | "active" | "suspended",
+      provisioningStatus: (provisioning?.status ?? "pending") as "pending" | "approved" | "active" | "suspended" | "terminated",
       memberCount: members.length,
       ownerInfo,
     };
@@ -278,5 +278,123 @@ export const reactivate = platformMutation({
     });
 
     return null;
+  },
+});
+
+// ============================================================================
+// terminate — permanently deactivate a tenant (FR-AD-006)
+// ============================================================================
+
+export const terminate = platformMutation({
+  args: {
+    tenantId: v.id("tenants"),
+    reason: v.string(),
+    confirmSlug: v.string(),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    if (!args.reason.trim()) {
+      throw new ConvexError("Reason is required for termination");
+    }
+
+    const tenant = await ctx.db.get(args.tenantId);
+    if (!tenant) throw new ConvexError("Tenant not found");
+
+    // Safety confirmation: slug must match
+    if (args.confirmSlug !== tenant.slug) {
+      throw new ConvexError("Confirmation slug does not match. Please type the tenant slug to confirm termination.");
+    }
+
+    const provisioning = await ctx.db
+      .query("tenant_provisioning")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
+      .first();
+    if (!provisioning) throw new ConvexError("Tenant provisioning record not found");
+    if (provisioning.status === "terminated") {
+      throw new ConvexError("Tenant is already terminated");
+    }
+
+    // Set provisioning to terminated
+    await ctx.db.patch(provisioning._id, { status: "terminated" });
+
+    // Cancel all memberships for this tenant
+    const memberships = await ctx.db
+      .query("memberships")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
+      .collect();
+
+    for (const membership of memberships) {
+      if (membership.status !== "cancelled") {
+        await ctx.db.patch(membership._id, { status: "cancelled" });
+      }
+    }
+
+    await ctx.scheduler.runAfter(0, internal.platformAuditLog.create, {
+      actorId: ctx.userId,
+      action: "tenant.terminated",
+      targetEntity: "tenants",
+      targetId: args.tenantId as string,
+      afterValue: { reason: args.reason, cancelledMemberships: memberships.length },
+    });
+
+    return null;
+  },
+});
+
+// ============================================================================
+// getMembers — paginated member list for a tenant (FR-AD-009)
+// ============================================================================
+
+export const getMembers = platformQuery({
+  args: {
+    tenantId: v.id("tenants"),
+    cursor: v.optional(v.string()),
+    limit: v.optional(v.number()),
+  },
+  returns: v.object({
+    members: v.array(v.object({
+      membershipId: v.id("memberships"),
+      userId: v.id("users"),
+      name: v.string(),
+      email: v.string(),
+      role: v.string(),
+      status: v.string(),
+      joinDate: v.string(),
+    })),
+    nextCursor: v.optional(v.string()),
+  }),
+  handler: async (ctx, args) => {
+    const limit = args.limit ?? 20;
+
+    const memberships = await ctx.db
+      .query("memberships")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
+      .collect();
+
+    // Enrich with user details
+    const enriched = await Promise.all(
+      memberships.map(async (m) => {
+        const user = await ctx.db.get(m.userId);
+        return {
+          membershipId: m._id,
+          userId: m.userId,
+          name: user?.name ?? "Unknown",
+          email: user?.email ?? "unknown",
+          role: m.role,
+          status: m.status,
+          joinDate: m.joinDate,
+        };
+      })
+    );
+
+    // Sort by name
+    enriched.sort((a, b) => a.name.localeCompare(b.name));
+
+    // Offset-based pagination
+    const startIdx = args.cursor ? parseInt(args.cursor, 10) : 0;
+    const page = enriched.slice(startIdx, startIdx + limit);
+    const nextCursor = startIdx + limit < enriched.length ? String(startIdx + limit) : undefined;
+
+    return { members: page, nextCursor };
   },
 });

@@ -61,6 +61,18 @@ export async function runSeed(scenario: SeedScenario): Promise<SeedContext> {
     memberships: membershipPayload,
   })) as { memberships: string[] };
 
+  // Step 3: Seed platform admins (need userId from above)
+  if (scenario.platformAdmins?.length) {
+    const platformAdminPayload = scenario.platformAdmins.map((pa) => ({
+      userId: userIdByKey[pa.userKey],
+      platformRole: pa.platformRole,
+    }));
+
+    await callTestEndpoint("/test/seed", {
+      platformAdmins: platformAdminPayload,
+    });
+  }
+
   // Build SeedContext
   const ctx: SeedContext = {
     prefix: scenario.tenants[0]?.slug.split("-").slice(0, 3).join("-") ?? "unknown",

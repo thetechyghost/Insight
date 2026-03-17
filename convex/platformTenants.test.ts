@@ -202,4 +202,111 @@ describe("platformTenants", () => {
     await t.finishAllScheduledFunctions(vi.runAllTimers);
     vi.useRealTimers();
   });
+
+  test("terminate sets provisioning to terminated and cancels memberships", async () => {
+    vi.useFakeTimers();
+    const t = convexTest(schema);
+    const { userId } = await seedPlatformAdmin(t);
+    const { tenantId } = await seedTenantWithProvisioning(t, userId, { slug: "doom-gym" });
+
+    // Add members
+    await t.run(async (ctx) => {
+      const m1 = await ctx.db.insert("users", { name: "Member1", email: "m1@test.com" });
+      const m2 = await ctx.db.insert("users", { name: "Member2", email: "m2@test.com" });
+      await ctx.db.insert("memberships", {
+        userId: m1, tenantId, role: "athlete", status: "active",
+        isPrimaryGym: true, joinDate: "2025-01-01",
+      });
+      await ctx.db.insert("memberships", {
+        userId: m2, tenantId, role: "coach", status: "active",
+        isPrimaryGym: true, joinDate: "2025-01-01",
+      });
+    });
+
+    const asAdmin = t.withIdentity({ email: "admin@platform.com", subject: "user|admin" });
+    await asAdmin.mutation(api.platformTenants.terminate, {
+      tenantId,
+      reason: "Business closed",
+      confirmSlug: "doom-gym",
+    });
+
+    // Verify provisioning status
+    const prov = await t.run(async (ctx) => {
+      return await ctx.db
+        .query("tenant_provisioning")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .unique();
+    });
+    expect(prov!.status).toBe("terminated");
+
+    // Verify all memberships cancelled
+    const memberships = await t.run(async (ctx) => {
+      return await ctx.db
+        .query("memberships")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .collect();
+    });
+    expect(memberships.every((m) => m.status === "cancelled")).toBe(true);
+
+    await t.finishAllScheduledFunctions(vi.runAllTimers);
+    const auditEntries = await t.run(async (ctx) =>
+      ctx.db.query("platform_audit_log").collect()
+    );
+    expect(auditEntries.some((e) => e.action === "tenant.terminated")).toBe(true);
+    vi.useRealTimers();
+  });
+
+  test("terminate rejects when confirmSlug does not match", async () => {
+    const t = convexTest(schema);
+    const { userId } = await seedPlatformAdmin(t);
+    const { tenantId } = await seedTenantWithProvisioning(t, userId, { slug: "real-slug" });
+
+    const asAdmin = t.withIdentity({ email: "admin@platform.com", subject: "user|admin" });
+    await expect(
+      asAdmin.mutation(api.platformTenants.terminate, {
+        tenantId,
+        reason: "Closing down",
+        confirmSlug: "wrong-slug",
+      })
+    ).rejects.toThrow("Confirmation slug does not match");
+  });
+
+  test("terminate rejects already terminated tenant", async () => {
+    const t = convexTest(schema);
+    const { userId } = await seedPlatformAdmin(t);
+
+    const { tenantId } = await t.run(async (ctx) => {
+      const tenantId = await ctx.db.insert("tenants", {
+        name: "Dead Gym", slug: "dead-gym",
+      });
+      await ctx.db.insert("tenant_provisioning", {
+        requestedBy: userId, tenantId, status: "terminated",
+      });
+      return { tenantId };
+    });
+
+    const asAdmin = t.withIdentity({ email: "admin@platform.com", subject: "user|admin" });
+    await expect(
+      asAdmin.mutation(api.platformTenants.terminate, {
+        tenantId,
+        reason: "Already gone",
+        confirmSlug: "dead-gym",
+      })
+    ).rejects.toThrow("already terminated");
+  });
+
+  test("terminate rejects empty reason", async () => {
+    const t = convexTest(schema);
+    const { userId } = await seedPlatformAdmin(t);
+    const { tenantId } = await seedTenantWithProvisioning(t, userId, { slug: "test-gym" });
+
+    const asAdmin = t.withIdentity({ email: "admin@platform.com", subject: "user|admin" });
+    await expect(
+      asAdmin.mutation(api.platformTenants.terminate, {
+        tenantId,
+        reason: "  ",
+        confirmSlug: "test-gym",
+      })
+    ).rejects.toThrow("Reason is required");
+  });
 });

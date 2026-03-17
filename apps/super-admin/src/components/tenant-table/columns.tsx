@@ -8,7 +8,7 @@ type TenantRow = {
   slug: string;
   _creationTime: number;
   memberCount: number;
-  provisioningStatus: "pending" | "approved" | "active" | "suspended";
+  provisioningStatus: "pending" | "approved" | "active" | "suspended" | "terminated";
 };
 
 const columnHelper = createColumnHelper<TenantRow>();
@@ -18,6 +18,7 @@ const statusVariant: Record<string, "default" | "secondary" | "destructive" | "o
   pending: "secondary",
   approved: "outline",
   suspended: "destructive",
+  terminated: "destructive",
 };
 
 export const columns = [

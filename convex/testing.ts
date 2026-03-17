@@ -141,6 +141,39 @@ export const seedRolesPermissions = internalMutation({
 });
 
 // ============================================================================
+// seedPlatformAdmin — create a platform_admins record for testing
+// ============================================================================
+
+export const seedPlatformAdmin = internalMutation({
+  args: {
+    userId: v.id("users"),
+    platformRole: v.union(
+      v.literal("super_admin"),
+      v.literal("platform_support"),
+      v.literal("platform_ops")
+    ),
+  },
+  returns: v.id("platform_admins"),
+  handler: async (ctx, args) => {
+    // Idempotent: return existing record if userId already exists
+    const existing = await ctx.db
+      .query("platform_admins")
+      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .unique();
+
+    if (existing) {
+      return existing._id;
+    }
+
+    return await ctx.db.insert("platform_admins", {
+      userId: args.userId,
+      platformRole: args.platformRole,
+      status: "active",
+    });
+  },
+});
+
+// ============================================================================
 // cleanupByPrefix — delete all test records matching a prefix pattern
 // ============================================================================
 

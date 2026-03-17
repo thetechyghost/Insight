@@ -2,6 +2,7 @@ import { ChevronsUpDown, LogOut } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -18,9 +19,10 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 interface NavUserProps {
   name: string;
   email: string;
+  onLogout?: () => void;
 }
 
-export function NavUser({ name, email }: NavUserProps) {
+export function NavUser({ name, email, onLogout }: NavUserProps) {
   const { isMobile } = useSidebar();
   const initials = name
     .split(" ")
@@ -54,12 +56,16 @@ export function NavUser({ name, email }: NavUserProps) {
             align="end"
             sideOffset={4}
           >
-            <DropdownMenuLabel>{name}</DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>{name}</DropdownMenuLabel>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut className="mr-2 h-4 w-4" />
-              Log out
-            </DropdownMenuItem>
+            <DropdownMenuGroup>
+              <DropdownMenuItem onClick={onLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

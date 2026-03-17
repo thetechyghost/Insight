@@ -4,6 +4,10 @@ import {
   CreditCard,
   Settings,
   ScrollText,
+  Flag,
+  Dumbbell,
+  Trophy,
+  Megaphone,
 } from "lucide-react";
 import {
   Sidebar,
@@ -14,6 +18,7 @@ import {
 } from "@/components/ui/sidebar";
 import { NavMain, type NavGroup } from "./nav-main";
 import { NavUser } from "./nav-user";
+import { getStoredAuth, clearAuth } from "@/lib/auth";
 
 const navGroups: NavGroup[] = [
   {
@@ -30,17 +35,37 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
+    label: "Content",
+    items: [
+      { title: "Exercises", url: "/exercises", icon: Dumbbell },
+      { title: "Benchmarks", url: "/benchmarks", icon: Trophy },
+      { title: "Announcements", url: "/announcements", icon: Megaphone },
+    ],
+  },
+  {
+    label: "Platform",
+    items: [
+      { title: "Feature Flags", url: "/feature-flags", icon: Flag },
+    ],
+  },
+  {
     label: "System",
     items: [
-      { title: "Settings", url: "/settings", icon: Settings, disabled: true },
-      { title: "Audit Log", url: "/audit-log", icon: ScrollText, disabled: true },
+      { title: "Settings", url: "/settings", icon: Settings },
+      { title: "Audit Log", url: "/audit-log", icon: ScrollText },
     ],
   },
 ];
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
-  // DEFERRED: Replace with usePlatformAdmin() hook when Convex Auth is configured
-  const user = { name: "Platform Admin", email: "admin@insight.com" };
+  const auth = getStoredAuth();
+  const email = auth?.email ?? "unknown";
+  const name = email.split("@")[0].split("+")[0]; // e.g. "alice" from "alice+t-xxx@test.insight.app"
+
+  function handleLogout() {
+    clearAuth();
+    window.location.href = "/login";
+  }
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -58,7 +83,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         <NavMain groups={navGroups} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser name={user.name} email={user.email} />
+        <NavUser name={name} email={email} onLogout={handleLogout} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

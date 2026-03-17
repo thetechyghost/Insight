@@ -26,10 +26,18 @@ export interface MembershipSeed {
   isPrimaryGym: boolean;
 }
 
+export type PlatformRole = "super_admin" | "platform_support" | "platform_ops";
+
+export interface PlatformAdminSeed {
+  userKey: string; // References UserSeed.key
+  platformRole: PlatformRole;
+}
+
 export interface SeedScenario {
   tenants: TenantSeed[];
   users: UserSeed[];
   memberships: MembershipSeed[];
+  platformAdmins?: PlatformAdminSeed[];
 }
 
 /**
@@ -73,6 +81,9 @@ export function foundationScenario(prefix: string): SeedScenario {
       { userKey: "frank", tenantKey: "cfAlpha", role: "athlete", isPrimaryGym: true },
       { userKey: "frank", tenantKey: "cfBeta", role: "athlete", isPrimaryGym: false },
       { userKey: "grace", tenantKey: "cfBeta", role: "owner", isPrimaryGym: true },
+    ],
+    platformAdmins: [
+      { userKey: "alice", platformRole: "super_admin" },
     ],
   };
 }

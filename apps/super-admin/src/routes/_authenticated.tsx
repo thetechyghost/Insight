@@ -1,15 +1,15 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { AppSidebar } from "@/components/app-sidebar";
+import { getStoredAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated")({
-  // When Convex Auth is wired up, uncomment this:
-  // beforeLoad: async ({ context }) => {
-  //   const admin = await context.convex.query(api.platformAdmins.getMe);
-  //   if (!admin) throw redirect({ to: "/login" });
-  //   return { platformAdmin: admin };
-  // },
+  beforeLoad: () => {
+    if (!getStoredAuth()) {
+      throw redirect({ to: "/login" });
+    }
+  },
   component: AuthenticatedLayout,
 });
 

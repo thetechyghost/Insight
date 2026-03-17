@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { authedQuery } from "./lib/customFunctions";
+import { platformQuery } from "./lib/platformFunctions";
 import { internalMutation } from "./_generated/server";
 
 const auditDoc = v.object({
@@ -15,31 +15,81 @@ const auditDoc = v.object({
 });
 
 // ============================================================================
-// list — list audit log entries with optional filters
+// list — list audit log entries with optional filters and pagination
 // ============================================================================
 
-export const list = authedQuery({
+export const list = platformQuery({
   args: {
     actorId: v.optional(v.id("users")),
+    action: v.optional(v.string()),
+    targetEntity: v.optional(v.string()),
+    cursor: v.optional(v.string()),
     limit: v.optional(v.number()),
   },
-  returns: v.array(auditDoc),
+  returns: v.object({
+    entries: v.array(auditDoc),
+    nextCursor: v.optional(v.string()),
+  }),
   handler: async (ctx, args) => {
     const limit = args.limit ?? 50;
 
+    let entries;
+
     if (args.actorId) {
-      return await ctx.db
+      entries = await ctx.db
         .query("platform_audit_log")
         .withIndex("by_actorId", (q) => q.eq("actorId", args.actorId!))
         .order("desc")
-        .take(limit);
+        .collect();
+    } else if (args.targetEntity) {
+      entries = await ctx.db
+        .query("platform_audit_log")
+        .withIndex("by_targetEntity", (q) => q.eq("targetEntity", args.targetEntity!))
+        .order("desc")
+        .collect();
+    } else {
+      entries = await ctx.db
+        .query("platform_audit_log")
+        .withIndex("by_timestamp")
+        .order("desc")
+        .collect();
     }
 
-    return await ctx.db
+    // Apply additional in-memory filters
+    if (args.action) {
+      entries = entries.filter((e) => e.action === args.action);
+    }
+    if (args.targetEntity && args.actorId) {
+      // If both actorId and targetEntity are provided, actorId index was used above
+      entries = entries.filter((e) => e.targetEntity === args.targetEntity);
+    }
+
+    // Offset-based pagination
+    const startIdx = args.cursor ? parseInt(args.cursor, 10) : 0;
+    const page = entries.slice(startIdx, startIdx + limit);
+    const nextCursor = startIdx + limit < entries.length ? String(startIdx + limit) : undefined;
+
+    return { entries: page, nextCursor };
+  },
+});
+
+// ============================================================================
+// getActions — distinct action values for filter dropdown
+// ============================================================================
+
+export const getActions = platformQuery({
+  args: {},
+  returns: v.array(v.string()),
+  handler: async (ctx) => {
+    const entries = await ctx.db
       .query("platform_audit_log")
       .withIndex("by_timestamp")
       .order("desc")
-      .take(limit);
+      .collect();
+
+    const actions = [...new Set(entries.map((e) => e.action))];
+    actions.sort();
+    return actions;
   },
 });
 

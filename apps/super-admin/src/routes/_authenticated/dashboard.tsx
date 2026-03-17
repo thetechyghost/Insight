@@ -22,6 +22,7 @@ function DashboardPage() {
   const overview = useQuery(api.platformMetrics.getOverview);
   const growth = useQuery(api.platformMetrics.getGrowthTrends);
   const healthFlags = useQuery(api.platformMetrics.getTenantHealthFlags);
+  const comparativeMetrics = useQuery(api.platformMetrics.getComparativeMetrics);
 
   if (!overview) {
     return <div className="text-muted-foreground">Loading...</div>;
@@ -120,6 +121,47 @@ function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Comparative Metrics */}
+      {comparativeMetrics && comparativeMetrics.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium">Tenant Comparison</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left px-4 py-2 font-medium">Tenant</th>
+                    <th className="text-left px-4 py-2 font-medium">Members</th>
+                    <th className="text-left px-4 py-2 font-medium">Active Rate (30d)</th>
+                    <th className="text-left px-4 py-2 font-medium">Workouts/Member (30d)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {comparativeMetrics.map((m) => (
+                    <tr key={m.tenantId} className="border-b last:border-0">
+                      <td className="px-4 py-2">
+                        <Link
+                          to="/tenants/$tenantId"
+                          params={{ tenantId: m.tenantId }}
+                          className="text-primary hover:underline"
+                        >
+                          {m.tenantName}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-2">{m.memberCount}</td>
+                      <td className="px-4 py-2">{m.activeRate30d}%</td>
+                      <td className="px-4 py-2">{m.workoutsPerMember30d}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Tenant Health Flags */}
       {healthFlags && healthFlags.length > 0 && (

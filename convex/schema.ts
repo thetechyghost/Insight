@@ -1494,7 +1494,7 @@ export default defineSchema({
     requestedBy: v.id("users"),
     tenantId: v.optional(v.id("tenants")),
     status: v.union(
-      v.literal("pending"), v.literal("approved"), v.literal("active"), v.literal("suspended"),
+      v.literal("pending"), v.literal("approved"), v.literal("active"), v.literal("suspended"), v.literal("terminated"),
     ),
     checklistState: v.optional(v.any()),
     stripeConnectOnboardingStatus: v.optional(v.string()),
@@ -1719,4 +1719,17 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_tenantId_provider", ["tenantId", "provider"]),
+
+  platform_announcements: defineTable({
+    title: v.string(),
+    content: v.string(),
+    priority: v.union(v.literal("info"), v.literal("warning"), v.literal("critical")),
+    targetTenantIds: v.optional(v.array(v.id("tenants"))),
+    publishedAt: v.optional(v.number()),
+    expiresAt: v.optional(v.number()),
+    status: v.union(v.literal("draft"), v.literal("published"), v.literal("archived")),
+    createdBy: v.id("users"),
+  })
+    .index("by_status", ["status"])
+    .index("by_publishedAt", ["publishedAt"]),
 });

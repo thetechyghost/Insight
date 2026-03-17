@@ -192,6 +192,21 @@ http.route({
       }
     }
 
+    // Seed platform admins
+    if (Array.isArray(body.platformAdmins)) {
+      result.platformAdmins = [];
+      for (const pa of body.platformAdmins) {
+        const paId = await ctx.runMutation(
+          internal.testing.seedPlatformAdmin,
+          {
+            userId: pa.userId,
+            platformRole: pa.platformRole,
+          }
+        );
+        (result.platformAdmins as string[]).push(paId);
+      }
+    }
+
     // Seed role permissions for each tenant
     if (result.tenants) {
       for (const tenantId of Object.values(
